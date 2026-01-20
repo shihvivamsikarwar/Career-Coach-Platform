@@ -1,0 +1,32 @@
+import React from "react";
+
+function PublicNavbar() {
+  return (
+    <nav
+      className="navbar navbar-expand-lg py-3"
+      style={{
+        background: "transparent",
+      }}
+    >
+      <div className="container">
+        {/* Logo + Title */}
+        <a
+          className="navbar-brand fw-bold d-flex align-items-center gap-2"
+          href="/"
+        >
+          <span style={{ fontSize: "22px" }}>🧠</span>
+          <span>AI Interview & Career Coach Platform</span>
+        </a>
+
+        {/* Login Button */}
+        <div>
+          <a href="/login" className="btn btn-primary rounded-pill px-4">
+            Log In
+          </a>
+        </div>
+      </div>
+    </nav>
+  );
+}
+
+export default PublicNavbar;

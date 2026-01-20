@@ -1,13 +1,17 @@
 import React from "react";
-import Navbar from "./Navbar";
+import PublicNavbar from "./PublicNavbar";
 import Hero from "./Hero";
 import Footer from "./Footer";
+import Feature from "./Feature";
+import HowItWorks from "./HowItWorks";
 
 function LandingPage() {
   return (
     <>
-      <Navbar />
+      <PublicNavbar />
       <Hero />
+      <Feature />
+      <HowItWorks />
       <Footer />
     </>
   );
