@@ -9,7 +9,6 @@ function PublicNavbar() {
       }}
     >
       <div className="container">
-        {/* Logo + Title */}
         <a
           className="navbar-brand fw-bold d-flex align-items-center gap-2"
           href="/"
@@ -18,7 +17,6 @@ function PublicNavbar() {
           <span>AI Interview & Career Coach Platform</span>
         </a>
 
-        {/* Login Button */}
         <div>
           <a href="/login" className="btn btn-primary rounded-pill px-4">
             Log In
