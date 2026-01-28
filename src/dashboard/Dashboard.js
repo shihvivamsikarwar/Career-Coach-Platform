@@ -1,4 +1,5 @@
 import React from "react";
+import { Link } from "react-router-dom";
 
 function Dashboard() {
   return (
@@ -56,9 +57,9 @@ function Dashboard() {
                 <p className="text-muted">
                   Upload your resume to analyze skills and get recommendations.
                 </p>
-                <a href="/upload-resume" className="btn btn-primary">
+                <Link to="/upload-resume" className="btn btn-primary">
                   Upload Resume
-                </a>
+                </Link>
               </div>
             </div>
           </div>
@@ -70,9 +71,9 @@ function Dashboard() {
                 <p className="text-muted">
                   Practice AI-based mock interviews and improve your skills.
                 </p>
-                <a href="/interview" className="btn btn-success">
+                <Link to="/interview" className="btn btn-success">
                   Start Interview
-                </a>
+                </Link>
               </div>
             </div>
           </div>
@@ -84,12 +85,12 @@ function Dashboard() {
                 <p className="text-muted">
                   View personalized career suggestions based on performance.
                 </p>
-                <a
-                  href="/career-guidance"
+                <Link
+                  to="/career-guidance"
                   className="btn btn-warning text-white"
                 >
                   View Guidance
-                </a>
+                </Link>
               </div>
             </div>
           </div>

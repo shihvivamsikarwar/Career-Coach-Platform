@@ -1,4 +1,5 @@
 import React from "react";
+import { Link } from "react-router-dom";
 
 function MockInterview() {
   return (
@@ -47,7 +48,9 @@ function MockInterview() {
                     Previous
                   </button>
 
-                  <button className="btn btn-success">Submit & Next</button>
+                  <Link to="/result" className="btn btn-success">
+                    Submit & Next
+                  </Link>
                 </div>
               </div>
             </div>

@@ -1,4 +1,5 @@
 import React from "react";
+import { Link } from "react-router-dom";
 
 function Hero() {
   return (
@@ -22,18 +23,18 @@ function Hero() {
             </p>
 
             <div className="d-flex gap-3 mb-3">
-              <a
-                href="/login"
+              <Link
+                to="/login"
                 className="btn btn-primary btn-lg rounded-pill px-4"
               >
                 Log In
-              </a>
-              <a
-                href="/register"
+              </Link>
+              <Link
+                to="/register"
                 className="btn btn-outline-secondary btn-lg rounded-pill px-4"
               >
                 Register
-              </a>
+              </Link>
             </div>
 
             <p className="text-muted">

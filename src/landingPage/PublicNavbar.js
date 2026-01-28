@@ -1,4 +1,5 @@
 import React from "react";
+import { Link } from "react-router-dom";
 
 function PublicNavbar() {
   return (
@@ -18,9 +19,9 @@ function PublicNavbar() {
         </a>
 
         <div>
-          <a href="/login" className="btn btn-primary rounded-pill px-4">
+          <Link to="/login" className="btn btn-primary rounded-pill px-4">
             Log In
-          </a>
+          </Link>
         </div>
       </div>
     </nav>
