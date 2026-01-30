@@ -20,6 +20,7 @@ import InterviewSelection from "./interviewSelection/InterviewSelection";
 import MockInterview from "./mockInterview/MockInterview";
 import ResultFeedback from "./resultFeedback/ResultFeedback";
 import CareerGuidance from "./careerGuidance/CareerGuidance";
+import InterviewResult from "./resultFeedback/InterviewResult";
 
 /* Components */
 import UserNavbar from "./components/UserNavbar";
@@ -50,7 +51,6 @@ function Layout({ isLoggedIn, setIsLoggedIn }) {
           element={<Login setIsLoggedIn={setIsLoggedIn} />}
         />
         <Route path="/register" element={<Register />} />
-
         {/* Protected */}
         <Route
           path="/dashboard"
@@ -77,10 +77,26 @@ function Layout({ isLoggedIn, setIsLoggedIn }) {
           }
         />
         <Route
-          path="/interview"
+          path="/interview-selection"
+          element={
+            <ProtectedRoute>
+              <InterviewSelection />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/mock-interview"
           element={
             <ProtectedRoute>
               <MockInterview />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/interview-result"
+          element={
+            <ProtectedRoute>
+              <InterviewResult />
             </ProtectedRoute>
           }
         />

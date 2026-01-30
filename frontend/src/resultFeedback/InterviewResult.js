@@ -1,12 +1,13 @@
 import React from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 
-function ResultFeedback() {
+function InterviewResult() {
   const location = useLocation();
   const navigate = useNavigate();
 
   const { score, feedback, domain } = location.state || {};
 
+  // Prevent direct URL access
   if (!score) {
     navigate("/dashboard");
     return null;
@@ -17,7 +18,7 @@ function ResultFeedback() {
       <h2>Interview Result</h2>
 
       <div className="card mt-4 p-4 shadow">
-        <h4>Domain: {domain}</h4>
+        <h4 className="text-muted">Domain: {domain}</h4>
         <h1 className="text-success mt-3">{score}%</h1>
         <p className="mt-3">{feedback}</p>
 
@@ -32,4 +33,4 @@ function ResultFeedback() {
   );
 }
 
-export default ResultFeedback;
+export default InterviewResult;

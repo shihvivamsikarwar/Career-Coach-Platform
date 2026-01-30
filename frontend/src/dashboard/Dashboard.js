@@ -71,7 +71,7 @@ function Dashboard() {
                 <p className="text-muted">
                   Practice AI-based mock interviews and improve your skills.
                 </p>
-                <Link to="/interview" className="btn btn-success">
+                <Link to="/interview-selection" className="btn btn-success">
                   Start Interview
                 </Link>
               </div>
