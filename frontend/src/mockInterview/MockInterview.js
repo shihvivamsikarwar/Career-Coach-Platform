@@ -1,38 +1,35 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 
 function MockInterview() {
-  const [questions, setQuestions] = useState([]);
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  const questions = location.state?.questions;
+  const difficulty = location.state?.difficulty || "easy";
+
   const [answers, setAnswers] = useState([]);
   const [loading, setLoading] = useState(false);
-  const navigate = useNavigate();
 
   useEffect(() => {
-    const domain = localStorage.getItem("interviewDomain");
-
-    if (!domain) {
-      alert("Please select interview first");
+    if (!questions || questions.length === 0) {
       navigate("/interview-selection");
       return;
     }
 
-    axios
-      .post("http://localhost:5000/api/interview/start", { domain })
-      .then((res) => {
-        setQuestions(res.data.questions);
-        setAnswers(new Array(res.data.questions.length).fill(""));
-      })
-      .catch((err) => console.error(err));
-  }, [navigate]);
+    setAnswers(new Array(questions.length).fill(""));
+  }, [questions, navigate]);
 
   const handleChange = (index, value) => {
     const updatedAnswers = [...answers];
     updatedAnswers[index] = value;
     setAnswers(updatedAnswers);
   };
+
   const handleSubmit = async () => {
     const isAnyEmpty = answers.some((ans) => ans.trim() === "");
+
     if (isAnyEmpty) {
       alert("Please answer all questions before submitting");
       return;
@@ -46,19 +43,24 @@ function MockInterview() {
         {
           answers,
           domain: localStorage.getItem("interviewDomain"),
+          difficulty,
+          userId: localStorage.getItem("userId"),
         }
       );
 
-      // Navigate to result page with data
       navigate("/interview-result", {
         state: {
           score: res.data.score,
+          grade: res.data.grade,
+          performanceMessage: res.data.performanceMessage,
           feedback: res.data.feedback,
           domain: res.data.domain,
+          difficulty,
         },
       });
     } catch (error) {
       alert("Submission failed");
+      console.error(error);
     } finally {
       setLoading(false);
     }
@@ -66,32 +68,37 @@ function MockInterview() {
 
   return (
     <div className="container mt-4">
-      <h2 className="mb-4">Mock Interview</h2>
+      <h2 className="mb-2">Mock Interview</h2>
 
-      {questions.length === 0 && <p>Loading questions...</p>}
+      <h5 className="text-muted mb-4">
+        Difficulty Level: <strong>{difficulty}</strong>
+      </h5>
 
-      {questions.map((q, index) => (
-        <div key={index} className="mb-4">
-          <label className="form-label fw-bold">
-            Q{index + 1}. {q}
-          </label>
-          <textarea
-            className="form-control"
-            rows="3"
-            value={answers[index]}
-            onChange={(e) => handleChange(index, e.target.value)}
-          />
-        </div>
-      ))}
+      {!questions && <p>Preparing your interview...</p>}
 
-      {questions.length > 0 && (
+      {questions &&
+        questions.map((q, index) => (
+          <div key={q._id} className="mb-4">
+            <label className="form-label fw-bold">
+              Q{index + 1}. {q.questionText}
+            </label>
+            <textarea
+              className="form-control"
+              rows="3"
+              value={answers[index] || ""}
+              onChange={(e) => handleChange(index, e.target.value)}
+            />
+          </div>
+        ))}
+
+      {questions && (
         <div className="text-center mt-5">
           <button
             className="btn btn-success px-5 py-2"
             onClick={handleSubmit}
             disabled={loading}
           >
-            {loading ? "Submitting..." : "Submit"}
+            {loading ? "Submitting..." : "Submit Interview"}
           </button>
         </div>
       )}

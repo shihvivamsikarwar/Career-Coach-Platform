@@ -1,6 +1,6 @@
 const mongoose = require("mongoose");
 
-const interviewSchema = new mongoose.Schema({
+const interviewQuestionSchema = new mongoose.Schema({
   questionText: {
     type: String,
     required: true,
@@ -20,4 +20,4 @@ const interviewSchema = new mongoose.Schema({
   },
 });
 
-module.exports = mongoose.model("Interview", interviewSchema);
+module.exports = mongoose.model("InterviewQuestion", interviewQuestionSchema);
