@@ -21,6 +21,8 @@ import MockInterview from "./mockInterview/MockInterview";
 import ResultFeedback from "./resultFeedback/ResultFeedback";
 import CareerGuidance from "./careerGuidance/CareerGuidance";
 import InterviewResult from "./resultFeedback/InterviewResult";
+import InterviewHistory from "./interviewHistory/InterviewHistory";
+import PerformanceAnalytics from "./analytics/PerformanceAnalytics";
 
 /* Components */
 import UserNavbar from "./components/UserNavbar";
@@ -116,6 +118,8 @@ function Layout({ isLoggedIn, setIsLoggedIn }) {
             </ProtectedRoute>
           }
         />
+        <Route path="/interview-history" element={<InterviewHistory />} />
+        <Route path="/analytics" element={<PerformanceAnalytics />} />
       </Routes>
     </>
   );

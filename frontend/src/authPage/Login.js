@@ -10,18 +10,20 @@ function Login({ setIsLoggedIn }) {
   const handleLogin = async (e) => {
     e.preventDefault();
     try {
-      await axios.post("http://localhost:5000/api/auth/login", {
+      const res = await axios.post("http://localhost:5000/api/auth/login", {
         email,
         password,
       });
+
+      localStorage.setItem("userId", res.data.user._id);
       localStorage.setItem("isLoggedIn", "true");
+
       setIsLoggedIn(true);
       navigate("/dashboard");
     } catch (err) {
       alert(err.response?.data?.message || "Login failed");
     }
   };
-
   return (
     <div
       className="min-vh-100 d-flex align-items-center justify-content-center"
