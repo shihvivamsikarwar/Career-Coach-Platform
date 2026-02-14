@@ -18,6 +18,9 @@ const interviewQuestionSchema = new mongoose.Schema({
     enum: ["easy", "medium", "hard"],
     default: "easy",
   },
+  conceptTag: {
+    type: String,
+  },
 });
 
 module.exports = mongoose.model("InterviewQuestion", interviewQuestionSchema);
