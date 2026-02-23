@@ -5,134 +5,190 @@ import axios from "axios";
 function Dashboard() {
   const navigate = useNavigate();
 
-  const [totalInterviews, setTotalInterviews] = useState(0);
-  const [averageScore, setAverageScore] = useState(0);
-  const [skillLevel, setSkillLevel] = useState("Beginner");
+  const [stats, setStats] = useState({
+    total: 0,
+    avg: 0,
+    level: "Beginner",
+  });
+
+  const [resume, setResume] = useState(null);
+
+  const userId = localStorage.getItem("userId");
 
   useEffect(() => {
-    const userId = localStorage.getItem("userId");
-
     if (!userId) return;
 
+    // Interview Stats
     axios
       .get(`http://localhost:5000/api/interview/history/${userId}`)
       .then((res) => {
         const history = res.data.history;
 
-        setTotalInterviews(history.length);
-        if (history.length > 0) {
-          const total = history.reduce((sum, item) => sum + item.score, 0);
-          const avg = Math.round(total / history.length);
-          setAverageScore(avg);
+        if (!history) return;
 
-          // Determine skill level
-          if (avg >= 85) setSkillLevel("Expert");
-          else if (avg >= 70) setSkillLevel("Advanced");
-          else if (avg >= 55) setSkillLevel("Intermediate");
-          else setSkillLevel("Beginner");
-        }
-      })
-      .catch((err) => console.error(err));
-  }, []);
+        const total = history.length;
+        const avg =
+          total > 0
+            ? Math.round(history.reduce((s, i) => s + i.score, 0) / total)
+            : 0;
+
+        let level = "Beginner";
+        if (avg >= 85) level = "Expert";
+        else if (avg >= 70) level = "Advanced";
+        else if (avg >= 55) level = "Intermediate";
+
+        setStats({ total, avg, level });
+      });
+
+    // Latest Resume
+    axios
+      .get(`http://localhost:5000/api/resume/latest/${userId}`)
+      .then((res) => {
+        setResume(res.data);
+      });
+  }, [userId]);
+
   return (
     <div
       className="min-vh-100"
       style={{
-        background: "linear-gradient(135deg, #f6f4ff, #e9e4ff)",
+        background: "linear-gradient(135deg, #eef2ff, #f8f9ff)",
       }}
     >
       <div className="container py-5">
-        {/* Welcome Section */}
-        <div className="mb-4">
-          <h2 className="fw-bold">Welcome 👋</h2>
+        {/* HEADER */}
+        <div className="mb-5">
+          <h2 className="fw-bold">👋 Welcome Back</h2>
           <p className="text-muted">
-            Here is your interview preparation and career progress overview.
+            Track your progress and improve your interview skills.
           </p>
         </div>
 
-        {/* Stats Cards */}
+        {/* STATS ROW */}
         <div className="row g-4 mb-5">
           <div className="col-md-4">
-            <div className="card shadow-sm border-0 rounded-4">
-              <div className="card-body text-center">
-                <h5 className="fw-semibold">Interviews Taken</h5>
-                <h2 className="fw-bold text-primary mt-2">{totalInterviews}</h2>
-              </div>
+            <div className="card shadow border-0 rounded-4 text-center p-4">
+              <h6 className="text-muted">Interviews Taken</h6>
+              <h2 className="fw-bold text-primary">{stats.total}</h2>
             </div>
           </div>
 
           <div className="col-md-4">
-            <div className="card shadow-sm border-0 rounded-4">
-              <div className="card-body text-center">
-                <h5 className="fw-semibold">Average Score</h5>
-                <h2 className="fw-bold text-success mt-2">{averageScore}%</h2>
-              </div>
+            <div className="card shadow border-0 rounded-4 text-center p-4">
+              <h6 className="text-muted">Average Score</h6>
+              <h2 className="fw-bold text-success">{stats.avg}%</h2>
             </div>
           </div>
 
           <div className="col-md-4">
-            <div className="card shadow-sm border-0 rounded-4">
-              <div className="card-body text-center">
-                <h5 className="fw-semibold">Skill Level</h5>
-                <h2 className="fw-bold text-warning mt-2">{skillLevel}</h2>
-              </div>
+            <div className="card shadow border-0 rounded-4 text-center p-4">
+              <h6 className="text-muted">Skill Level</h6>
+              <h2 className="fw-bold text-warning">{stats.level}</h2>
             </div>
           </div>
         </div>
 
-        {/* Action Cards */}
+        {/* MAIN CARDS */}
         <div className="row g-4">
+          {/* RESUME CARD */}
           <div className="col-md-4">
-            <div className="card h-100 shadow-sm border-0 rounded-4">
+            <div className="card shadow-lg border-0 rounded-4 h-100">
               <div className="card-body">
-                <h5 className="fw-bold">Upload Resume</h5>
-                <p className="text-muted">
-                  Upload your resume to analyze skills and get recommendations.
-                </p>
-                <Link to="/upload-resume" className="btn btn-primary">
+                <h5 className="fw-bold mb-3">📄 Resume Center</h5>
+
+                {resume ? (
+                  <>
+                    <p className="text-success fw-semibold">
+                      Resume Uploaded ✅
+                    </p>
+
+                    <p className="small text-muted">
+                      Last Upload:{" "}
+                      {new Date(resume.createdAt).toLocaleDateString()}
+                    </p>
+
+                    <button
+                      className="btn btn-success w-100"
+                      onClick={() => navigate(`/resume-analysis/${resume._id}`)}
+                    >
+                      View Analysis
+                    </button>
+                  </>
+                ) : (
+                  <>
+                    <p className="text-muted">No resume uploaded yet.</p>
+                  </>
+                )}
+
+                <Link
+                  to="/upload-resume"
+                  className="btn btn-primary mt-3 w-100"
+                >
                   Upload Resume
+                </Link>
+
+                <Link
+                  to="/my-resumes"
+                  className="btn btn-outline-dark mt-2 w-100"
+                >
+                  My Resumes
                 </Link>
               </div>
             </div>
           </div>
 
+          {/* INTERVIEW CARD */}
           <div className="col-md-4">
-            <div className="card h-100 shadow-sm border-0 rounded-4">
+            <div className="card shadow-lg border-0 rounded-4 h-100">
               <div className="card-body">
-                <h5 className="fw-bold">Start Interview</h5>
-                <p className="text-muted">
-                  Practice AI-based mock interviews and improve your skills.
-                </p>
-                <Link to="/interview-selection" className="btn btn-success">
+                <h5 className="fw-bold mb-3">🎤 Interview Practice</h5>
+
+                <p className="text-muted">Improve with AI mock interviews.</p>
+
+                <div className="progress mb-3" style={{ height: "8px" }}>
+                  <div
+                    className="progress-bar bg-success"
+                    style={{ width: `${stats.avg}%` }}
+                  ></div>
+                </div>
+
+                <Link
+                  to="/interview-selection"
+                  className="btn btn-success w-100"
+                >
                   Start Interview
                 </Link>
 
                 <button
-                  className="btn btn-outline-primary mt-3 w-100"
+                  className="btn btn-outline-primary mt-2 w-100"
                   onClick={() => navigate("/interview-history")}
                 >
-                  View Interview History
+                  Interview History
                 </button>
+
                 <button
                   className="btn btn-dark mt-2 w-100"
                   onClick={() => navigate("/analytics")}
                 >
-                  View Detailed Analytics
+                  Performance Analytics
                 </button>
               </div>
             </div>
           </div>
 
+          {/* CAREER CARD */}
           <div className="col-md-4">
-            <div className="card h-100 shadow-sm border-0 rounded-4">
+            <div className="card shadow-lg border-0 rounded-4 h-100">
               <div className="card-body">
-                <h5 className="fw-bold">Career Guidance</h5>
+                <h5 className="fw-bold mb-3">🚀 Career Guidance</h5>
+
                 <p className="text-muted">
-                  View personalized career suggestions based on performance.
+                  Personalized recommendations based on your skills.
                 </p>
+
                 <Link
                   to="/career-guidance"
-                  className="btn btn-warning text-white"
+                  className="btn btn-warning text-white w-100"
                 >
                   View Guidance
                 </Link>

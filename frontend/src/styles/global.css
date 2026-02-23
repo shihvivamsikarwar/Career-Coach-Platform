@@ -1,0 +1,46 @@
+body {
+  background: #f8fafc;
+  font-family: "Inter", sans-serif;
+}
+
+/* Card */
+.card-modern {
+  border: none;
+  border-radius: 14px;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08);
+}
+
+/* Buttons */
+.btn-primary {
+  background: #4f46e5;
+  border: none;
+}
+
+.btn-primary:hover {
+  background: #4338ca;
+}
+
+/* Section spacing */
+.section {
+  padding: 40px 0;
+}
+
+/* Sidebar buttons */
+.question-btn {
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
+}
+
+/* Timer */
+.timer {
+  font-weight: bold;
+  color: #ef4444;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .sidebar {
+    display: none;
+  }
+}

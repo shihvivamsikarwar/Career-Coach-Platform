@@ -6,15 +6,12 @@ const resumeSchema = new mongoose.Schema({
     ref: "User",
     required: true,
   },
-  fileName: {
-    type: String,
-    required: true,
-  },
-  filePath: {
-    type: String,
-    required: true,
-  },
-  uploadedAt: {
+  fileUrl: String,
+  extractedText: String,
+  skills: [String],
+  score: Number,
+  suggestions: [String],
+  createdAt: {
     type: Date,
     default: Date.now,
   },
