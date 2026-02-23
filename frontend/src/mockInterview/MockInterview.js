@@ -2,6 +2,17 @@ import React, { useEffect, useState, useCallback } from "react";
 import axios from "axios";
 import { useNavigate, useLocation } from "react-router-dom";
 
+import {
+  FaClock,
+  FaCheckCircle,
+  FaTimesCircle,
+  FaExclamationTriangle,
+  FaArrowLeft,
+  FaArrowRight,
+  FaPaperPlane,
+  FaExpand,
+} from "react-icons/fa";
+
 function MockInterview() {
   const navigate = useNavigate();
   const location = useLocation();
@@ -19,9 +30,9 @@ function MockInterview() {
   const [fullscreenWarningCount, setFullscreenWarningCount] = useState(0);
   const [tabWarningCount, setTabWarningCount] = useState(0);
 
-  // ===============================
-  // FETCH QUESTIONS
-  // ===============================
+  const [showResume, setShowResume] = useState(false);
+
+  // ================= FETCH QUESTIONS =================
   useEffect(() => {
     if (!domain || !difficulty) {
       navigate("/interview-selection");
@@ -39,26 +50,23 @@ function MockInterview() {
       .catch((err) => console.error(err));
   }, [domain, difficulty, navigate]);
 
-  // ===============================
-  // FULL SCREEN MODE
-  // ===============================
-  useEffect(() => {
-    const enterFullScreen = async () => {
-      try {
-        if (document.documentElement.requestFullscreen) {
-          await document.documentElement.requestFullscreen();
-        }
-      } catch (err) {
-        console.log("Fullscreen error:", err);
+  // ================= FULLSCREEN =================
+  const enterFullScreen = async () => {
+    try {
+      if (!document.fullscreenElement) {
+        await document.documentElement.requestFullscreen();
+        setShowResume(false);
       }
-    };
+    } catch (err) {
+      console.log("Fullscreen denied");
+    }
+  };
 
+  useEffect(() => {
     enterFullScreen();
   }, []);
 
-  // ===============================
-  // SUBMIT FUNCTION
-  // ===============================
+  // ================= SUBMIT =================
   const handleSubmit = useCallback(async () => {
     setLoading(true);
 
@@ -88,22 +96,19 @@ function MockInterview() {
     }
   }, [answers, domain, difficulty, navigate]);
 
-  // ===============================
-  // FULLSCREEN EXIT DETECTION
-  // ===============================
+  // ================= FULLSCREEN EXIT DETECT =================
   useEffect(() => {
     const handleFullscreenChange = () => {
       if (!document.fullscreenElement) {
         setFullscreenWarningCount((prev) => {
           const newCount = prev + 1;
 
-          alert(`⚠ Fullscreen exit detected! (${newCount}/3)`);
-
           if (newCount >= 3) {
-            alert("Too many fullscreen exits. Auto-submitting.");
+            alert("Too many fullscreen exits. Auto submitting.");
             handleSubmit();
           } else {
-            document.documentElement.requestFullscreen();
+            alert(`⚠ Fullscreen exited (${newCount}/3)`);
+            setShowResume(true);
           }
 
           return newCount;
@@ -117,19 +122,16 @@ function MockInterview() {
       document.removeEventListener("fullscreenchange", handleFullscreenChange);
   }, [handleSubmit]);
 
-  // ===============================
-  // TAB SWITCH DETECTION
-  // ===============================
+  // ================= TAB SWITCH DETECT =================
   useEffect(() => {
     const handleVisibilityChange = () => {
       if (document.hidden) {
         setTabWarningCount((prev) => {
           const newCount = prev + 1;
 
-          alert(`⚠ Tab switching detected! (${newCount}/3)`);
+          alert(`⚠ Tab switch detected (${newCount}/3)`);
 
           if (newCount >= 3) {
-            alert("Too many tab switches. Auto-submitting.");
             handleSubmit();
           }
 
@@ -144,9 +146,7 @@ function MockInterview() {
       document.removeEventListener("visibilitychange", handleVisibilityChange);
   }, [handleSubmit]);
 
-  // ===============================
-  // AUTO LOCK + NEXT
-  // ===============================
+  // ================= TIMER =================
   const handleNextAuto = useCallback(() => {
     setLockedQuestions((prev) =>
       prev.includes(currentIndex) ? prev : [...prev, currentIndex]
@@ -158,9 +158,6 @@ function MockInterview() {
     }
   }, [currentIndex, questions.length]);
 
-  // ===============================
-  // TIMER
-  // ===============================
   useEffect(() => {
     if (!questions.length) return;
 
@@ -176,36 +173,18 @@ function MockInterview() {
     return () => clearInterval(timer);
   }, [timeLeft, handleNextAuto, questions.length]);
 
-  // ===============================
-  // AUTO SUBMIT WHEN ALL LOCKED
-  // ===============================
+  // ================= AUTO SUBMIT =================
   useEffect(() => {
     if (questions.length > 0 && lockedQuestions.length === questions.length) {
       handleSubmit();
     }
   }, [lockedQuestions, questions.length, handleSubmit]);
 
-  // ===============================
-  // ANSWER HANDLER
-  // ===============================
+  // ================= ANSWER =================
   const handleChange = (value) => {
     const updated = [...answers];
     updated[currentIndex] = value;
     setAnswers(updated);
-  };
-
-  const nextQuestion = () => {
-    if (currentIndex < questions.length - 1) {
-      setCurrentIndex((prev) => prev + 1);
-      setTimeLeft(80);
-    }
-  };
-
-  const prevQuestion = () => {
-    if (currentIndex > 0) {
-      setCurrentIndex((prev) => prev - 1);
-      setTimeLeft(80);
-    }
   };
 
   if (!questions.length)
@@ -216,12 +195,50 @@ function MockInterview() {
   const progress = ((currentIndex + 1) / questions.length) * 100;
 
   return (
-    <div className="container-fluid mt-4">
-      <div className="row">
-        {/* Sidebar */}
-        <div className="col-md-2 border-end">
-          <h6 className="mb-3">Questions</h6>
+    <div className="container-fluid">
+      {/* HEADER */}
+      <div className="bg-white shadow-sm p-3 sticky-top">
+        <div className="d-flex justify-content-between align-items-center flex-wrap">
+          <div className="d-flex gap-4">
+            <span>
+              <FaClock /> {timeLeft}s
+            </span>
 
+            <span className="text-success">
+              <FaCheckCircle /> {attempted}
+            </span>
+
+            <span className="text-danger">
+              <FaTimesCircle /> {skipped}
+            </span>
+
+            <span className="text-warning">
+              <FaExclamationTriangle />{" "}
+              {fullscreenWarningCount + tabWarningCount}
+            </span>
+          </div>
+
+          {showResume && (
+            <button
+              className="btn btn-warning btn-sm"
+              onClick={enterFullScreen}
+            >
+              <FaExpand /> Resume Fullscreen
+            </button>
+          )}
+        </div>
+
+        <div className="progress mt-2" style={{ height: "6px" }}>
+          <div
+            className="progress-bar bg-success"
+            style={{ width: `${progress}%` }}
+          />
+        </div>
+      </div>
+
+      <div className="row mt-3">
+        {/* SIDEBAR */}
+        <div className="col-md-2 border-end">
           {questions.map((_, index) => (
             <button
               key={index}
@@ -241,31 +258,11 @@ function MockInterview() {
           ))}
         </div>
 
-        {/* Main Area */}
+        {/* MAIN */}
         <div className="col-md-10">
-          <h4>Mock Interview</h4>
-          <h6>Difficulty: {difficulty}</h6>
+          <div className="card shadow-sm p-4">
+            <h5 className="mb-3">Question {currentIndex + 1}</h5>
 
-          <div className="progress my-3" style={{ height: "10px" }}>
-            <div
-              className="progress-bar bg-success"
-              style={{ width: `${progress}%` }}
-            ></div>
-          </div>
-
-          <div className="d-flex justify-content-between">
-            <span>Attempted: {attempted}</span>
-            <span>Skipped: {skipped}</span>
-            <span className="text-danger">Time Left: {timeLeft}s</span>
-          </div>
-
-          <div className="text-danger mt-2">
-            Fullscreen Violations: {fullscreenWarningCount} / 3 | Tab
-            Violations: {tabWarningCount} / 3
-          </div>
-
-          <div className="card p-4 shadow-sm mt-3">
-            <h5>Question {currentIndex + 1}</h5>
             <p className="fw-bold">{questions[currentIndex].questionText}</p>
 
             <textarea
@@ -280,10 +277,10 @@ function MockInterview() {
           <div className="d-flex justify-content-between mt-4">
             <button
               className="btn btn-secondary"
-              onClick={prevQuestion}
               disabled={currentIndex === 0}
+              onClick={() => setCurrentIndex((p) => p - 1)}
             >
-              Previous
+              <FaArrowLeft /> Previous
             </button>
 
             {currentIndex === questions.length - 1 ? (
@@ -292,11 +289,14 @@ function MockInterview() {
                 onClick={handleSubmit}
                 disabled={loading}
               >
-                {loading ? "Submitting..." : "Submit Interview"}
+                <FaPaperPlane /> Submit
               </button>
             ) : (
-              <button className="btn btn-primary" onClick={nextQuestion}>
-                Next
+              <button
+                className="btn btn-primary"
+                onClick={() => setCurrentIndex((p) => p + 1)}
+              >
+                Next <FaArrowRight />
               </button>
             )}
           </div>
