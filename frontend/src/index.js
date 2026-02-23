@@ -23,6 +23,8 @@ import CareerGuidance from "./careerGuidance/CareerGuidance";
 import InterviewResult from "./resultFeedback/InterviewResult";
 import InterviewHistory from "./interviewHistory/InterviewHistory";
 import PerformanceAnalytics from "./analytics/PerformanceAnalytics";
+import ResumeDashboard from "./resume/ResumeDashboard";
+import ResumeAnalysis from "./resume/ResumeAnalysis";
 
 /* Components */
 import UserNavbar from "./components/UserNavbar";
@@ -120,6 +122,8 @@ function Layout({ isLoggedIn, setIsLoggedIn }) {
         />
         <Route path="/interview-history" element={<InterviewHistory />} />
         <Route path="/analytics" element={<PerformanceAnalytics />} />
+        <Route path="/my-resumes" element={<ResumeDashboard />} />
+        <Route path="/resume-analysis/:id" element={<ResumeAnalysis />} />
       </Routes>
     </>
   );
