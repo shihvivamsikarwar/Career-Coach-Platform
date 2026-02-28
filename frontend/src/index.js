@@ -26,6 +26,11 @@ import PerformanceAnalytics from "./analytics/PerformanceAnalytics";
 import ResumeDashboard from "./resume/ResumeDashboard";
 import ResumeAnalysis from "./resume/ResumeAnalysis";
 
+/*Pages*/
+import JobMatch from "./pages/JobMatch";
+import JobMatchHistory from "./pages/JobMatchHistory";
+import JobMatchAnalytics from "./pages/JobMatchAnalytics";
+
 /* Components */
 import UserNavbar from "./components/UserNavbar";
 import ProtectedRoute from "./components/ProtectedRoute";
@@ -124,6 +129,9 @@ function Layout({ isLoggedIn, setIsLoggedIn }) {
         <Route path="/analytics" element={<PerformanceAnalytics />} />
         <Route path="/my-resumes" element={<ResumeDashboard />} />
         <Route path="/resume-analysis/:id" element={<ResumeAnalysis />} />
+        <Route path="/job-match" element={<JobMatch />} />
+        <Route path="/job-match-history" element={<JobMatchHistory />} />
+        <Route path="/job-match-analytics" element={<JobMatchAnalytics />} />
       </Routes>
     </>
   );

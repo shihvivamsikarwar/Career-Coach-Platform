@@ -1,0 +1,98 @@
+/* ===== BACKGROUND ===== */
+
+.resume-bg {
+  background: linear-gradient(135deg, #eef2ff, #f8fafc);
+  min-height: 100vh;
+}
+
+/* ===== GLASS CARD ===== */
+
+.glass-card {
+  background: rgba(255, 255, 255, 0.6);
+  backdrop-filter: blur(14px);
+  border-radius: 20px;
+  box-shadow: 0 10px 35px rgba(0, 0, 0, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.4);
+}
+
+/* ===== SCORE CIRCLE ===== */
+
+.score-circle {
+  width: 160px;
+  height: 160px;
+  border-radius: 50%;
+  background: conic-gradient(#4f46e5 var(--score), #e5e7eb 0%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: auto;
+}
+
+.score-inner {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  background: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 28px;
+  font-weight: bold;
+}
+
+/* ===== SKILL BADGE ===== */
+
+.skill-badge {
+  padding: 8px 14px;
+  border-radius: 30px;
+  background: #10b981;
+  color: white;
+  font-size: 14px;
+  margin: 4px;
+  display: inline-block;
+}
+
+/* ===== MISSING BADGE ===== */
+
+.missing-badge {
+  padding: 8px 14px;
+  border-radius: 30px;
+  background: #ef4444;
+  color: white;
+  font-size: 14px;
+  margin: 4px;
+  display: inline-block;
+}
+
+/* ===== ROLE BADGE ===== */
+
+.role-badge {
+  padding: 8px 14px;
+  border-radius: 30px;
+  background: #4f46e5;
+  color: white;
+  font-size: 14px;
+  margin: 4px;
+  display: inline-block;
+}
+
+/* ===== SECTION TITLE ===== */
+
+.section-title {
+  font-weight: 600;
+  margin-bottom: 15px;
+}
+
+/* ===== PROGRESS BAR ===== */
+
+.skill-bar {
+  height: 10px;
+  border-radius: 10px;
+  background: #e5e7eb;
+  overflow: hidden;
+}
+
+.skill-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #4f46e5, #6366f1);
+}

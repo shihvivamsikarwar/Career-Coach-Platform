@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import axios from "axios";
 
 function ResumeDashboard() {
@@ -6,22 +6,28 @@ function ResumeDashboard() {
 
   const userId = localStorage.getItem("userId");
 
-  useEffect(() => {
-    fetchResumes();
-  }, []);
-
-  const fetchResumes = async () => {
+  // ==============================
+  // FETCH RESUMES
+  // ==============================
+  const fetchResumes = useCallback(async () => {
     try {
       const res = await axios.get(
         `http://localhost:5000/api/resume/user/${userId}`
       );
 
-      setResumes(res.data.resumes);
+      setResumes(res.data); // ✅ FIXED
     } catch (error) {
       console.error(error);
     }
-  };
+  }, [userId]);
 
+  useEffect(() => {
+    fetchResumes();
+  }, [fetchResumes]);
+
+  // ==============================
+  // DELETE
+  // ==============================
   const handleDelete = async (id) => {
     if (!window.confirm("Delete this resume?")) return;
 
@@ -41,29 +47,33 @@ function ResumeDashboard() {
       }}
     >
       <div className="container py-5">
-        <h2 className="fw-bold mb-4">My Resumes</h2>
+        <h2 className="fw-bold mb-4">📄 My Resumes</h2>
 
         <div className="row g-4">
           {resumes.map((resume) => (
             <div key={resume._id} className="col-md-4">
               <div className="card shadow-lg border-0 rounded-4 h-100">
                 <div className="card-body">
-                  <h5 className="fw-bold mb-2">📄 {resume.fileName}</h5>
+                  <h5 className="fw-bold mb-2">
+                    📄 {resume.fileUrl?.split("\\").pop()}
+                  </h5>
 
                   <p className="text-muted small">
                     Uploaded: {new Date(resume.createdAt).toLocaleDateString()}
                   </p>
 
+                  {/* SCORE */}
                   <div className="my-3">
                     <span className="badge bg-success fs-6">
-                      Score: {resume.score || 0}%
+                      Score: {resume.aiAnalysis?.score || 0}%
                     </span>
                   </div>
 
+                  {/* SKILLS */}
                   <div className="mb-3">
                     <strong>Skills:</strong>
                     <div>
-                      {resume.skills?.map((skill, i) => (
+                      {resume.aiAnalysis?.skills?.map((skill, i) => (
                         <span key={i} className="badge bg-primary me-1 mb-1">
                           {skill}
                         </span>
@@ -71,10 +81,16 @@ function ResumeDashboard() {
                     </div>
                   </div>
 
+                  {/* ACTIONS */}
                   <div className="d-flex justify-content-between">
-                    <button className="btn btn-outline-primary btn-sm">
+                    <a
+                      href={`http://localhost:5000/${resume.fileUrl}`}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="btn btn-outline-primary btn-sm"
+                    >
                       Download
-                    </button>
+                    </a>
 
                     <button
                       className="btn btn-outline-danger btn-sm"

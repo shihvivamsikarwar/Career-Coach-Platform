@@ -1,5 +1,4 @@
-// interviewController.js
-
+const { generateQuestions } = require("../services/aiService");
 // Start Interview: send questions based on domain
 exports.startInterview = (req, res) => {
   try {
@@ -96,5 +95,18 @@ exports.submitInterview = (req, res) => {
       message: "Interview submission failed",
       error: error.message,
     });
+  }
+};
+
+exports.startInterview = async (req, res) => {
+  try {
+    const { domain, difficulty } = req.body;
+
+    const questions = await generateQuestions(domain, difficulty);
+
+    res.json({ success: true, questions });
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({ message: "AI Error" });
   }
 };

@@ -1,0 +1,20 @@
+.job-bg {
+  background: linear-gradient(135deg, #eef2ff, #f9fafc);
+  min-height: 100vh;
+}
+
+.glass-card {
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(14px);
+  border-radius: 18px;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
+}
+
+.missing-badge {
+  background: #ffe4e6;
+  color: #dc2626;
+  padding: 6px 12px;
+  border-radius: 12px;
+  margin: 4px;
+  display: inline-block;
+}

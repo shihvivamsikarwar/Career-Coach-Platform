@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import axios from "axios";
+import "../styles/dashboard.css";
 
 function Dashboard() {
   const navigate = useNavigate();
@@ -9,24 +10,28 @@ function Dashboard() {
     total: 0,
     avg: 0,
     level: "Beginner",
+    jobMatches: 0,
+    jobAvg: 0,
   });
 
   const [resume, setResume] = useState(null);
+  const [loading, setLoading] = useState(true);
 
   const userId = localStorage.getItem("userId");
 
   useEffect(() => {
     if (!userId) return;
 
-    // Interview Stats
-    axios
-      .get(`http://localhost:5000/api/interview/history/${userId}`)
-      .then((res) => {
-        const history = res.data.history;
-
-        if (!history) return;
+    Promise.all([
+      axios.get(`http://localhost:5000/api/interview/history/${userId}`),
+      axios.get(`http://localhost:5000/api/resume/latest/${userId}`),
+      axios.get(`http://localhost:5000/api/job/analytics/${userId}`),
+    ])
+      .then(([historyRes, resumeRes, jobRes]) => {
+        const history = historyRes?.data?.history || [];
 
         const total = history.length;
+
         const avg =
           total > 0
             ? Math.round(history.reduce((s, i) => s + i.score, 0) / total)
@@ -37,62 +42,62 @@ function Dashboard() {
         else if (avg >= 70) level = "Advanced";
         else if (avg >= 55) level = "Intermediate";
 
-        setStats({ total, avg, level });
-      });
+        const jobAnalytics = jobRes?.data || {};
 
-    // Latest Resume
-    axios
-      .get(`http://localhost:5000/api/resume/latest/${userId}`)
-      .then((res) => {
-        setResume(res.data);
-      });
+        setStats({
+          total,
+          avg,
+          level,
+          jobMatches: jobAnalytics.totalMatches || 0,
+          jobAvg: jobAnalytics.avgScore || 0,
+        });
+
+        setResume(resumeRes?.data || null);
+      })
+      .catch((err) => console.error(err))
+      .finally(() => setLoading(false));
   }, [userId]);
 
+  if (loading) {
+    return (
+      <div className="d-flex justify-content-center align-items-center vh-100">
+        <h4>Loading Dashboard...</h4>
+      </div>
+    );
+  }
+
   return (
-    <div
-      className="min-vh-100"
-      style={{
-        background: "linear-gradient(135deg, #eef2ff, #f8f9ff)",
-      }}
-    >
+    <div className="premium-bg">
       <div className="container py-5">
         {/* HEADER */}
         <div className="mb-5">
           <h2 className="fw-bold">👋 Welcome Back</h2>
           <p className="text-muted">
-            Track your progress and improve your interview skills.
+            Track your progress and boost your career with AI insights.
           </p>
         </div>
 
-        {/* STATS ROW */}
-        <div className="row g-4 mb-5">
-          <div className="col-md-4">
-            <div className="card shadow border-0 rounded-4 text-center p-4">
-              <h6 className="text-muted">Interviews Taken</h6>
-              <h2 className="fw-bold text-primary">{stats.total}</h2>
-            </div>
-          </div>
-
-          <div className="col-md-4">
-            <div className="card shadow border-0 rounded-4 text-center p-4">
-              <h6 className="text-muted">Average Score</h6>
-              <h2 className="fw-bold text-success">{stats.avg}%</h2>
-            </div>
-          </div>
-
-          <div className="col-md-4">
-            <div className="card shadow border-0 rounded-4 text-center p-4">
-              <h6 className="text-muted">Skill Level</h6>
-              <h2 className="fw-bold text-warning">{stats.level}</h2>
-            </div>
-          </div>
+        {/* STATS */}
+        <div className="row g-4 mb-4">
+          <StatCard
+            title="Interviews Taken"
+            value={stats.total}
+            color="primary"
+          />
+          <StatCard
+            title="Average Score"
+            value={`${stats.avg}%`}
+            color="success"
+          />
+          <StatCard title="Skill Level" value={stats.level} color="warning" />
+          <StatCard title="Job Matches" value={stats.jobMatches} color="dark" />
         </div>
 
-        {/* MAIN CARDS */}
+        {/* MAIN SECTION */}
         <div className="row g-4">
-          {/* RESUME CARD */}
-          <div className="col-md-4">
-            <div className="card shadow-lg border-0 rounded-4 h-100">
+          {/* Resume Center */}
+          <div className="col-lg-4">
+            <div className="card premium-card h-100">
               <div className="card-body">
                 <h5 className="fw-bold mb-3">📄 Resume Center</h5>
 
@@ -115,49 +120,67 @@ function Dashboard() {
                     </button>
                   </>
                 ) : (
-                  <>
-                    <p className="text-muted">No resume uploaded yet.</p>
-                  </>
+                  <p className="text-muted">No resume uploaded yet.</p>
                 )}
 
-                <Link
-                  to="/upload-resume"
+                <button
                   className="btn btn-primary mt-3 w-100"
+                  onClick={() => navigate("/upload-resume")}
                 >
                   Upload Resume
-                </Link>
+                </button>
 
-                <Link
-                  to="/my-resumes"
+                <button
                   className="btn btn-outline-dark mt-2 w-100"
+                  onClick={() => navigate("/my-resumes")}
                 >
                   My Resumes
+                </button>
+
+                <Link to="/job-match" className="btn btn-dark mt-2 w-100">
+                  🎯 Job Match AI
                 </Link>
+
+                <button
+                  className="btn btn-outline-dark mt-2 w-100"
+                  onClick={() => navigate("/job-match-history")}
+                >
+                  Job Match History
+                </button>
+
+                <button
+                  className="btn btn-dark mt-2 w-100"
+                  onClick={() => navigate("/job-match-analytics")}
+                >
+                  Job Match Analytics
+                </button>
               </div>
             </div>
           </div>
 
-          {/* INTERVIEW CARD */}
-          <div className="col-md-4">
-            <div className="card shadow-lg border-0 rounded-4 h-100">
+          {/* Interview Section */}
+          <div className="col-lg-4">
+            <div className="card premium-card h-100">
               <div className="card-body">
                 <h5 className="fw-bold mb-3">🎤 Interview Practice</h5>
 
-                <p className="text-muted">Improve with AI mock interviews.</p>
+                <p className="text-muted">
+                  Improve with AI mock interviews and feedback.
+                </p>
 
-                <div className="progress mb-3" style={{ height: "8px" }}>
+                <div className="progress mb-3" style={{ height: 8 }}>
                   <div
                     className="progress-bar bg-success"
                     style={{ width: `${stats.avg}%` }}
-                  ></div>
+                  />
                 </div>
 
-                <Link
-                  to="/interview-selection"
+                <button
                   className="btn btn-success w-100"
+                  onClick={() => navigate("/interview-selection")}
                 >
                   Start Interview
-                </Link>
+                </button>
 
                 <button
                   className="btn btn-outline-primary mt-2 w-100"
@@ -176,9 +199,9 @@ function Dashboard() {
             </div>
           </div>
 
-          {/* CAREER CARD */}
-          <div className="col-md-4">
-            <div className="card shadow-lg border-0 rounded-4 h-100">
+          {/* Career Guidance */}
+          <div className="col-lg-4">
+            <div className="card premium-card h-100">
               <div className="card-body">
                 <h5 className="fw-bold mb-3">🚀 Career Guidance</h5>
 
@@ -186,16 +209,46 @@ function Dashboard() {
                   Personalized recommendations based on your skills.
                 </p>
 
-                <Link
-                  to="/career-guidance"
+                <button
                   className="btn btn-warning text-white w-100"
+                  onClick={() => navigate("/career-guidance")}
                 >
                   View Guidance
-                </Link>
+                </button>
               </div>
             </div>
           </div>
         </div>
+
+        {/* JOB MATCH ANALYTICS */}
+        <div className="card premium-card mt-5">
+          <div className="card-body">
+            <h5 className="fw-bold mb-3">📊 Job Match Analytics</h5>
+
+            <div className="row text-center">
+              <div className="col-md-6">
+                <h6 className="text-muted">Total Matches</h6>
+                <h3 className="fw-bold">{stats.jobMatches}</h3>
+              </div>
+
+              <div className="col-md-6">
+                <h6 className="text-muted">Average Match Score</h6>
+                <h3 className="fw-bold">{stats.jobAvg}%</h3>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function StatCard({ title, value, color }) {
+  return (
+    <div className="col-md-3">
+      <div className="card premium-card text-center p-4">
+        <h6 className="text-muted">{title}</h6>
+        <h2 className={`fw-bold text-${color}`}>{value}</h2>
       </div>
     </div>
   );
