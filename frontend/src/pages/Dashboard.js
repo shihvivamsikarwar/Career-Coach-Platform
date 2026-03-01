@@ -2,10 +2,6 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import DashboardLayout from "../components/layout/DashboardLayout";
 import StatsCards from "../components/dashboard/StatsCards";
-import ResumeCenter from "./components/ResumeCenter";
-import JobMatchCard from "./components/JobMatchCard";
-import AnalyticsChart from "./components/AnalysticsChart";
-import DashboardHeader from "./components/DashboardHeader";
 
 function Dashboard() {
   const [stats, setStats] = useState({
@@ -40,19 +36,8 @@ function Dashboard() {
   return (
     <DashboardLayout>
       <h4 className="mb-4 fw-bold">Dashboard Overview</h4>
-      <DashboardHeader />
+
       <StatsCards stats={stats} />
-      <div className="row mt-4">
-        <div className="col-lg-4">
-          <ResumeCenter />
-        </div>
-        <div className="col-lg-8">
-          <JobMatchCard />
-        </div>
-        <div className="col-lg-12">
-          <AnalyticsChart />
-        </div>
-      </div>
     </DashboardLayout>
   );
 }

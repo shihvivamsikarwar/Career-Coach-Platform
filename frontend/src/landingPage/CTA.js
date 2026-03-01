@@ -1,33 +1,50 @@
 import React from "react";
+import { Container, Button } from "react-bootstrap";
 import { Link } from "react-router-dom";
 
 function CTA() {
   return (
-    <div
-      className="py-5 text-center"
+    <section
+      className="py-5"
       style={{
-        background: "linear-gradient(135deg, #4f46e5, #6366f1)",
+        background: "linear-gradient(135deg, #6366F1, #8B5CF6)",
         color: "white",
       }}
     >
-      <div className="container">
-        <h2 className="fw-bold mb-3">
-          Start Your Interview Preparation Journey Today
-        </h2>
+      <Container className="text-center py-4">
+        {/* Heading */}
+        <h2 className="fw-bold mb-3">Ready to Crack Your Dream Job?</h2>
 
-        <p className="mb-4">
-          Practice interviews, analyze your resume, and receive career guidance
-          powered by AI.
+        <p
+          className="mb-4"
+          style={{
+            maxWidth: "600px",
+            margin: "0 auto",
+            opacity: 0.9,
+          }}
+        >
+          Join thousands of students improving their careers with AI powered
+          resume analysis and mock interviews.
         </p>
 
-        <Link
-          to="/register"
-          className="btn btn-light btn-lg rounded-pill px-4 fw-semibold"
-        >
-          Get Started Free
+        {/* Button */}
+        <Link to="/register">
+          <Button
+            size="lg"
+            className="px-5 py-3 fw-semibold"
+            style={{
+              borderRadius: "40px",
+              background: "white",
+              color: "#6366F1",
+              border: "none",
+              boxShadow: "0px 10px 30px rgba(0,0,0,0.2)",
+            }}
+          >
+            Get Started Free
+          </Button>
         </Link>
-      </div>
-    </div>
+      </Container>
+    </section>
   );
 }
 

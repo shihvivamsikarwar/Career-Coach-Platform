@@ -7,10 +7,12 @@ import Stats from "./Stats";
 import Testimonials from "./Testimonials";
 import CTA from "./CTA";
 import "../styles/landingPage.css";
+import PublicNavbar from "./PublicNavbar";
 
 function LandingPage() {
   return (
     <>
+      <PublicNavbar />
       <Hero />
       <Stats />
       <Feature />

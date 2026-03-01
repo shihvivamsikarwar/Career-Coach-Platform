@@ -3,100 +3,57 @@ import { Link } from "react-router-dom";
 
 function Hero() {
   return (
-    <section
-      className="py-5 text-center position-relative"
-      style={{
-        background: "linear-gradient(135deg,#eef2ff,#f8fafc)",
-        overflow: "hidden",
-      }}
-    >
-      {/* Background Glow Effect */}
-      <div
-        style={{
-          position: "absolute",
-          top: "-120px",
-          left: "50%",
-          transform: "translateX(-50%)",
-          width: "400px",
-          height: "400px",
-          background: "rgba(99,102,241,0.25)",
-          filter: "blur(140px)",
-          borderRadius: "50%",
-        }}
-      ></div>
+    <section className="section-padding section-soft section-glow hero-section position-relative overflow-hidden">
+      {/* Glow Background */}
+      <div className="hero-glow"></div>
 
-      <div className="container py-5 position-relative">
+      <div
+        className="container text-center position-relative"
+        style={{ zIndex: 2 }}
+      >
         {/* Badge */}
-        <span className="badge bg-primary-subtle text-primary px-3 py-2 mb-3">
-          🚀 AI Powered Interview Platform
-        </span>
+        <div className="badge-pill mb-4">🚀 AI Powered Interview Platform</div>
 
         {/* Heading */}
-        <h1
-          className="fw-bold mb-4"
-          style={{
-            fontSize: "3rem",
-            lineHeight: "1.2",
-            maxWidth: "800px",
-            margin: "0 auto",
-          }}
-        >
+        <h1 className="hero-title fw-bold mb-4">
           Crack Interviews Faster with{" "}
-          <span style={{ color: "#6366F1" }}>AI Career Coach</span>
+          <span className="gradient-text">AI Career Coach</span>
         </h1>
 
         {/* Subtitle */}
-        <p
-          className="text-muted fs-5 mb-4"
-          style={{ maxWidth: "650px", margin: "0 auto" }}
-        >
+        <p className="hero-subtitle mx-auto mb-5">
           Practice real interview questions, analyze your resume, and receive
           personalized career guidance powered by AI.
         </p>
 
         {/* Buttons */}
-        <div className="d-flex justify-content-center gap-3 mb-4 flex-wrap">
-          <Link
-            to="/register"
-            className="btn btn-lg px-4 py-2"
-            style={{
-              borderRadius: "30px",
-              background: "linear-gradient(135deg,#6366F1,#8B5CF6)",
-              color: "white",
-              fontWeight: "600",
-              boxShadow: "0px 6px 20px rgba(99,102,241,0.3)",
-            }}
-          >
+        <div className="d-flex justify-content-center gap-3 flex-wrap mb-5">
+          <Link to="/register" className="btn hero-btn-primary">
             Get Started Free
           </Link>
 
-          <Link
-            to="/login"
-            className="btn btn-outline-dark btn-lg rounded-pill px-4"
-          >
+          <Link to="/login" className="btn hero-btn-outline">
             Login
           </Link>
         </div>
 
-        {/* Trust Stats */}
-        <div className="d-flex justify-content-center gap-5 mt-4 flex-wrap">
-          <div>
-            <h4 className="fw-bold mb-0">10K+</h4>
-            <small className="text-muted">Students</small>
-          </div>
-
-          <div>
-            <h4 className="fw-bold mb-0">95%</h4>
-            <small className="text-muted">Success Rate</small>
-          </div>
-
-          <div>
-            <h4 className="fw-bold mb-0">500+</h4>
-            <small className="text-muted">Interview Questions</small>
-          </div>
+        {/* Stats */}
+        <div className="row justify-content-center g-4 mt-4">
+          <Stat number="10K+" label="Students" />
+          <Stat number="95%" label="Success Rate" />
+          <Stat number="500+" label="Interview Questions" />
         </div>
       </div>
     </section>
+  );
+}
+
+function Stat({ number, label }) {
+  return (
+    <div className="col-4 col-md-2 text-center">
+      <h4 className="fw-bold mb-1">{number}</h4>
+      <p className="text-muted small">{label}</p>
+    </div>
   );
 }
 

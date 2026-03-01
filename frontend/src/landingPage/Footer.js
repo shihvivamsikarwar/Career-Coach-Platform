@@ -1,86 +1,90 @@
 import React from "react";
+import { Container, Row, Col } from "react-bootstrap";
 import { Link } from "react-router-dom";
 
 function Footer() {
   return (
     <footer
+      className="pt-5 pb-3"
       style={{
-        background: "linear-gradient(135deg, #0f172a, #1e293b)",
-        color: "#e2e8f0",
+        background: "#0f172a",
+        color: "#cbd5e1",
       }}
     >
-      <div className="container py-5">
-        <div className="row g-4">
-          {/* Brand */}
-          <div className="col-md-4">
-            <h4 className="fw-bold mb-3">🧠 AI Career Coach</h4>
-            <p style={{ color: "#cbd5f5" }}>
-              An intelligent platform to help students prepare for interviews,
-              analyze resumes, and receive personalized career guidance using
-              AI.
-            </p>
-          </div>
+      <Container>
+        <Row className="gy-4">
+          {/* Logo + About */}
+          <Col md={4}>
+            <h5 className="fw-bold text-white mb-3">🧠 AI Career Coach</h5>
 
-          {/* Quick Links */}
-          <div className="col-md-2">
-            <h6 className="fw-bold mb-3">Platform</h6>
-            <ul className="list-unstyled">
-              <li>
-                <Link to="/" className="footer-link">
-                  Home
-                </Link>
-              </li>
-              <li>
-                <Link to="/login" className="footer-link">
-                  Login
-                </Link>
-              </li>
-              <li>
-                <Link to="/register" className="footer-link">
-                  Register
-                </Link>
-              </li>
-            </ul>
-          </div>
+            <p style={{ fontSize: "14px" }}>
+              AI powered platform to help students crack interviews, analyze
+              resumes, and get personalized career guidance.
+            </p>
+          </Col>
+
+          {/* Platform Links */}
+          <Col md={2}>
+            <h6 className="text-white mb-3">Platform</h6>
+
+            <div className="d-flex flex-column gap-2">
+              <Link to="/" className="footer-link">
+                Home
+              </Link>
+              <Link to="/login" className="footer-link">
+                Login
+              </Link>
+              <Link to="/register" className="footer-link">
+                Register
+              </Link>
+            </div>
+          </Col>
 
           {/* Features */}
-          <div className="col-md-3">
-            <h6 className="fw-bold mb-3">Features</h6>
-            <ul className="list-unstyled">
-              <li className="footer-link">AI Mock Interviews</li>
-              <li className="footer-link">Resume Analysis</li>
-              <li className="footer-link">Performance Analytics</li>
-              <li className="footer-link">Career Guidance</li>
-            </ul>
-          </div>
+          <Col md={3}>
+            <h6 className="text-white mb-3">Features</h6>
+
+            <div className="d-flex flex-column gap-2">
+              <span className="footer-link">Resume Analysis</span>
+              <span className="footer-link">Mock Interviews</span>
+              <span className="footer-link">Career Guidance</span>
+              <span className="footer-link">Job Match AI</span>
+            </div>
+          </Col>
 
           {/* Contact */}
-          <div className="col-md-3">
-            <h6 className="fw-bold mb-3">Contact</h6>
+          <Col md={3}>
+            <h6 className="text-white mb-3">Contact</h6>
+
             <p className="mb-1">📧 support@aicareercoach.com</p>
             <p className="mb-1">📍 India</p>
+          </Col>
+        </Row>
 
-            <div className="d-flex gap-3 mt-2">
-              <span>🔗</span>
-              <span>🐦</span>
-              <span>💼</span>
-            </div>
-          </div>
-        </div>
+        {/* Divider */}
+        <hr style={{ borderColor: "#334155", marginTop: "30px" }} />
 
         {/* Bottom */}
-        <hr style={{ borderColor: "#334155" }} />
-
-        <div className="d-flex justify-content-between flex-column flex-md-row">
-          <p className="mb-0" style={{ color: "#94a3b8" }}>
-            © 2026 AI Interview & Career Coach Platform
-          </p>
-
-          <p className="mb-0" style={{ color: "#94a3b8" }}>
-            Developed for Academic Purpose | B.Tech CSE Project
-          </p>
+        <div className="text-center" style={{ fontSize: "14px" }}>
+          © {new Date().getFullYear()} AI Career Coach Platform. All rights
+          reserved.
         </div>
-      </div>
+      </Container>
+
+      {/* Hover Styles */}
+      <style jsx>{`
+        .footer-link {
+          color: #cbd5e1;
+          text-decoration: none;
+          font-size: 14px;
+          transition: 0.2s;
+        }
+
+        .footer-link:hover {
+          color: white;
+          transform: translateX(3px);
+        }
+      `}</style>
     </footer>
   );
 }

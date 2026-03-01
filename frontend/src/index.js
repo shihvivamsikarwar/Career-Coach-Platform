@@ -6,6 +6,7 @@ import {
   Route,
   useLocation,
 } from "react-router-dom";
+import "bootstrap/dist/css/bootstrap.min.css";
 
 /* Public */
 import LandingPage from "./landingPage/LandingPage";
@@ -30,9 +31,10 @@ import ResumeAnalysis from "./resume/ResumeAnalysis";
 import JobMatch from "./pages/JobMatch";
 import JobMatchHistory from "./pages/JobMatchHistory";
 import JobMatchAnalytics from "./pages/JobMatchAnalytics";
+import DashboardLayout from "./components/layout/DashboardLayout";
 
 /* Components */
-import UserNavbar from "./components/UserNavbar";
+
 import ProtectedRoute from "./components/ProtectedRoute";
 
 function Layout({ isLoggedIn, setIsLoggedIn }) {
@@ -45,13 +47,6 @@ function Layout({ isLoggedIn, setIsLoggedIn }) {
 
   return (
     <>
-      {/* NAVBAR LOGIC */}
-      {isLoggedIn && !isPublicPage ? (
-        <UserNavbar setIsLoggedIn={setIsLoggedIn} />
-      ) : (
-        <PublicNavbar />
-      )}
-
       <Routes>
         {/* Public */}
         <Route path="/" element={<LandingPage />} />
