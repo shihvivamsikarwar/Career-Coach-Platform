@@ -12,15 +12,15 @@ import Register from "./authPage/Register";
 /* Protected Pages */
 import Dashboard from "./pages/Dashboard";
 import UploadResume from "./pages/UploadResume";
-import InterviewSelection from "./pages/InterviewHome";
 import MockInterview from "./pages/MockInterview";
 import InterviewHistory from "./pages/InterviewHistory";
-import InterviewResult from "./resultFeedback/InterviewResult";
+import InterviewResult from "./pages/InterviewResult";
 import ResultFeedback from "./resultFeedback/ResultFeedback";
 import CareerGuidance from "./pages/CareerGuidance";
 import PerformanceAnalytics from "./analytics/PerformanceAnalytics";
 import ResumeAnalysis from "./resume/ResumeAnalysis";
 
+/*JOB Matcher*/
 import JobMatch from "./pages/JobMatch";
 import JobMatchHistory from "./pages/JobMatchHistory";
 import JobMatchAnalytics from "./pages/JobMatchAnalytics";
@@ -30,6 +30,10 @@ import JobMatchResult from "./pages/JobMatchResult";
 /* Components */
 import ProtectedRoute from "./components/ProtectedRoute";
 import MyResumes from "./pages/MyResumes";
+
+/*Interviews Pages*/
+import InterviewHome from "./pages/InterviewHome";
+import InterviewSetup from "./pages/InterviewSetup";
 
 function AppRoutes({ setIsLoggedIn }) {
   return (
@@ -54,15 +58,6 @@ function AppRoutes({ setIsLoggedIn }) {
         element={
           <ProtectedRoute>
             <UploadResume />
-          </ProtectedRoute>
-        }
-      />
-
-      <Route
-        path="/interview-selection"
-        element={
-          <ProtectedRoute>
-            <InterviewSelection />
           </ProtectedRoute>
         }
       />
@@ -156,6 +151,22 @@ function AppRoutes({ setIsLoggedIn }) {
         element={
           <ProtectedRoute>
             <MyResumes />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/interview-selection"
+        element={
+          <ProtectedRoute>
+            <InterviewHome />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/interview/setup/:domain"
+        element={
+          <ProtectedRoute>
+            <InterviewSetup />
           </ProtectedRoute>
         }
       />
