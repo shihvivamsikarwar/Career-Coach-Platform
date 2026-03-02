@@ -1,8 +1,10 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
+import DashboardLayout from "../layout/DashboardLayout";
 
 function JobMatchAnalytics() {
   const [data, setData] = useState(null);
+
   const userId = localStorage.getItem("userId");
 
   useEffect(() => {
@@ -21,17 +23,24 @@ function JobMatchAnalytics() {
     }
   };
 
-  if (!data) return <p>Loading...</p>;
+  if (!data)
+    return (
+      <DashboardLayout>
+        <p className="text-center mt-5">Loading...</p>
+      </DashboardLayout>
+    );
 
   return (
-    <div className="container py-5">
-      <h2>Job Match Analytics</h2>
+    <DashboardLayout>
+      <div className="container py-5">
+        <h2 className="mb-4">📈 Job Match Analytics</h2>
 
-      <div className="card p-4">
-        <h4>Total Matches: {data.totalMatches}</h4>
-        <h4>Average Score: {data.avgScore}%</h4>
+        <div className="card p-4 shadow-sm">
+          <h4>Total Matches: {data.totalMatches}</h4>
+          <h4>Average Score: {data.avgScore}%</h4>
+        </div>
       </div>
-    </div>
+    </DashboardLayout>
   );
 }
 

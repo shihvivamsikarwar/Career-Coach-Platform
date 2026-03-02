@@ -96,9 +96,12 @@ exports.matchJob = async (req, res) => {
 // ======================================================
 // GET JOB MATCH HISTORY
 // ======================================================
+
 exports.getJobMatchHistory = async (req, res) => {
   try {
     const { userId } = req.params;
+
+    console.log("Fetching history for:", userId);
 
     if (!mongoose.Types.ObjectId.isValid(userId)) {
       return res.status(400).json({ message: "Invalid userId" });
@@ -108,9 +111,11 @@ exports.getJobMatchHistory = async (req, res) => {
       userId: new mongoose.Types.ObjectId(userId),
     }).sort({ createdAt: -1 });
 
-    res.json(history);
+    console.log("History found:", history.length);
+
+    res.status(200).json(history);
   } catch (error) {
-    console.error(error);
+    console.error("History error:", error);
     res.status(500).json({ message: "Failed to fetch history" });
   }
 };
@@ -149,5 +154,29 @@ exports.getJobMatchAnalytics = async (req, res) => {
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Analytics error" });
+  }
+};
+
+// ======================================================
+// GET SINGLE JOB MATCH
+// ======================================================
+exports.getJobMatchById = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const match = await JobMatch.findById(id);
+
+    if (!match) {
+      return res.status(404).json({
+        message: "Match not found",
+      });
+    }
+
+    res.json(match);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({
+      message: "Failed to fetch match",
+    });
   }
 };

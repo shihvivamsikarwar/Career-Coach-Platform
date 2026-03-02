@@ -20,7 +20,6 @@ function JobMatch() {
   const [loading, setLoading] = useState(false);
 
   const navigate = useNavigate();
-
   const userId = localStorage.getItem("userId");
 
   // ===============================
@@ -76,6 +75,14 @@ function JobMatch() {
             <p className="text-muted">
               Compare your resume with job requirements and get hiring insights
             </p>
+
+            {/* ⭐ HISTORY BUTTON ADDED */}
+            <button
+              className="btn btn-outline-dark mt-3"
+              onClick={() => navigate(`/job/history/${userId}`)}
+            >
+              📊 View Match History
+            </button>
           </div>
 
           {/* INPUT CARD */}
@@ -220,23 +227,6 @@ function JobMatch() {
                   </div>
                 </div>
               )}
-
-              {/* ACTION BUTTONS */}
-              <div className="text-center mt-4 d-flex justify-content-center gap-3">
-                <button
-                  className="btn btn-outline-dark"
-                  onClick={() => navigate(`/job/history/${userId}`)}
-                >
-                  View Match History
-                </button>
-
-                <button
-                  className="btn btn-dark"
-                  onClick={() => navigate(`/job/analytics/${userId}`)}
-                >
-                  View Analytics
-                </button>
-              </div>
             </>
           )}
         </div>
