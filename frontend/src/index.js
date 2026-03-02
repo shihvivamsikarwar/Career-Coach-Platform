@@ -12,7 +12,7 @@ import Register from "./authPage/Register";
 /* Protected Pages */
 import Dashboard from "./pages/Dashboard";
 import UploadResume from "./pages/UploadResume";
-import InterviewSelection from "./pages/InterviewSelection";
+import InterviewSelection from "./pages/InterviewHome";
 import MockInterview from "./pages/MockInterview";
 import InterviewHistory from "./pages/InterviewHistory";
 import InterviewResult from "./resultFeedback/InterviewResult";
@@ -24,6 +24,8 @@ import ResumeAnalysis from "./resume/ResumeAnalysis";
 import JobMatch from "./pages/JobMatch";
 import JobMatchHistory from "./pages/JobMatchHistory";
 import JobMatchAnalytics from "./pages/JobMatchAnalytics";
+import JobMatchReport from "./pages/JobMatchReport";
+import JobMatchResult from "./pages/JobMatchResult";
 
 /* Components */
 import ProtectedRoute from "./components/ProtectedRoute";
@@ -137,23 +139,18 @@ function AppRoutes({ setIsLoggedIn }) {
         }
       />
 
+      <Route path="/job/history/:userId" element={<JobMatchHistory />} />
+      <Route path="/job/analytics/:userId" element={<JobMatchAnalytics />} />
       <Route
-        path="/job-match-history"
+        path="/job/report/:id"
         element={
           <ProtectedRoute>
-            <JobMatchHistory />
+            <JobMatchReport />
           </ProtectedRoute>
         }
       />
+      <Route path="/job/result/:id" element={<JobMatchResult />} />
 
-      <Route
-        path="/job-match-analytics"
-        element={
-          <ProtectedRoute>
-            <JobMatchAnalytics />
-          </ProtectedRoute>
-        }
-      />
       <Route
         path="/my-resumes"
         element={
