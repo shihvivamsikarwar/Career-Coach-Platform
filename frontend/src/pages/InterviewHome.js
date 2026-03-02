@@ -2,6 +2,7 @@ import React from "react";
 import { useNavigate } from "react-router-dom";
 import DashboardLayout from "../layout/DashboardLayout";
 import "../styles/interview.css";
+
 import softwareImg from "../images/Software.png";
 import webImg from "../images/web.png";
 import datascienceImg from "../images/datascience.png";
@@ -13,37 +14,16 @@ function InterviewHome() {
   const navigate = useNavigate();
 
   const domains = [
-    {
-      title: "Software Development",
-      image: softwareImg,
-      path: "/interview/software",
-    },
-    {
-      title: "Web Development",
-      image: webImg,
-      path: "/interview/web",
-    },
-    {
-      title: "Data Science",
-      image: datascienceImg,
-      path: "/interview/data",
-    },
-    {
-      title: "Machine Learning",
-      image: mlImg,
-      path: "/interview/ml",
-    },
-    {
-      title: "Cyber Security",
-      image: cyberImg,
-      path: "/interview/cyber",
-    },
-    {
-      title: "Cloud Computing",
-      image: cloudImg,
-      path: "/interview/cloud",
-    },
+    { title: "Software Development", image: softwareImg },
+    { title: "Web Development", image: webImg },
+    { title: "Data Science", image: datascienceImg },
+    { title: "Machine Learning", image: mlImg },
+    { title: "Cyber Security", image: cyberImg },
+    { title: "Cloud Computing", image: cloudImg },
   ];
+
+  // convert title → url slug
+  const createSlug = (title) => title.toLowerCase().replace(/\s+/g, "-");
 
   return (
     <DashboardLayout>
@@ -53,7 +33,9 @@ function InterviewHome() {
             <div
               key={index}
               className="col-lg-4 col-md-6"
-              onClick={() => navigate(domain.path)}
+              onClick={() =>
+                navigate(`/interview/setup/${createSlug(domain.title)}`)
+              }
               style={{ cursor: "pointer" }}
             >
               <div
