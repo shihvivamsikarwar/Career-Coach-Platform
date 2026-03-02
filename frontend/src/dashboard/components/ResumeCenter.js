@@ -4,71 +4,61 @@ import { useNavigate } from "react-router-dom";
 
 function ResumeCenter() {
   const [resume, setResume] = useState(null);
-  const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
+  const userId = localStorage.getItem("userId");
+
   useEffect(() => {
-    const userId = localStorage.getItem("userId");
+    if (userId) fetchResume();
+  }, [userId]);
 
-    if (!userId) return;
+  const fetchResume = async () => {
+    try {
+      const res = await axios.get(
+        `http://localhost:5000/api/resume/latest/${userId}`
+      );
 
-    axios
-      .get(`http://localhost:5000/api/resume/latest/${userId}`)
-      .then((res) => {
-        setResume(res.data);
-        setLoading(false);
-      })
-      .catch(() => {
-        setResume(null);
-        setLoading(false);
-      });
-  }, []);
+      console.log("Resume API:", res.data); // debug
+
+      setResume(res.data);
+    } catch (err) {
+      console.error("Resume fetch error:", err);
+    }
+  };
 
   return (
-    <div className="card shadow-sm border-0 rounded-4 h-100">
-      <div className="card-body">
-        <h5 className="fw-bold mb-3">📄 Resume Center</h5>
+    <div className="card shadow-sm border-0 rounded-4 p-4">
+      <h5 className="fw-bold mb-3">📄 Resume Center</h5>
 
-        {loading ? (
-          <p className="text-muted">Loading...</p>
-        ) : resume ? (
-          <>
-            <p className="mb-2">
-              <strong>Status:</strong>{" "}
-              <span className="badge bg-success">Uploaded</span>
-            </p>
+      {resume ? (
+        <>
+          <p className="text-success fw-semibold">Resume Uploaded ✅</p>
 
-            <p className="mb-3">
-              <strong>Score:</strong> {resume.analysis?.score || 0}%
-            </p>
+          <p className="small text-muted">
+            Last Upload: {new Date(resume.createdAt).toLocaleDateString()}
+          </p>
 
-            <button
-              className="btn btn-success w-100 mb-2"
-              onClick={() => navigate(`/resume-analysis/${resume._id}`)}
-            >
-              View Analysis
-            </button>
-          </>
-        ) : (
-          <>
-            <p className="text-muted">No resume uploaded yet</p>
+          <p>
+            Score: <strong>{resume.score || 0}%</strong>
+          </p>
 
-            <button
-              className="btn btn-primary w-100 mb-2"
-              onClick={() => navigate("/upload-resume")}
-            >
-              Upload Resume
-            </button>
-          </>
-        )}
+          <button
+            className="btn btn-primary w-100 mb-2"
+            onClick={() => navigate(`/resume-analysis/${resume._id}`)}
+          >
+            View Analysis
+          </button>
+        </>
+      ) : (
+        <p className="text-muted">No resume uploaded yet.</p>
+      )}
 
-        <button
-          className="btn btn-outline-dark w-100"
-          onClick={() => navigate("/my-resumes")}
-        >
-          My Resumes
-        </button>
-      </div>
+      <button
+        className="btn btn-success w-100"
+        onClick={() => navigate("/upload-resume")}
+      >
+        Upload Resume
+      </button>
     </div>
   );
 }

@@ -1,134 +1,168 @@
 import React, { useState, useEffect } from "react";
 import ReactDOM from "react-dom/client";
-import {
-  BrowserRouter as Router,
-  Routes,
-  Route,
-  useLocation,
-} from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+
 import "bootstrap/dist/css/bootstrap.min.css";
 
 /* Public */
 import LandingPage from "./landingPage/LandingPage";
-import PublicNavbar from "./landingPage/PublicNavbar";
 import Login from "./authPage/Login";
 import Register from "./authPage/Register";
 
-/* User */
-import Dashboard from "./dashboard/Dashboard";
-import UploadResume from "./uploadResume/UploadResume";
-import InterviewSelection from "./interviewSelection/InterviewSelection";
-import MockInterview from "./mockInterview/MockInterview";
-import ResultFeedback from "./resultFeedback/ResultFeedback";
-import CareerGuidance from "./careerGuidance/CareerGuidance";
+/* Protected Pages */
+import Dashboard from "./pages/Dashboard";
+import UploadResume from "./pages/UploadResume";
+import InterviewSelection from "./pages/InterviewSelection";
+import MockInterview from "./pages/MockInterview";
+import InterviewHistory from "./pages/InterviewHistory";
 import InterviewResult from "./resultFeedback/InterviewResult";
-import InterviewHistory from "./interviewHistory/InterviewHistory";
+import ResultFeedback from "./resultFeedback/ResultFeedback";
+import CareerGuidance from "./pages/CareerGuidance";
 import PerformanceAnalytics from "./analytics/PerformanceAnalytics";
-import ResumeDashboard from "./resume/ResumeDashboard";
 import ResumeAnalysis from "./resume/ResumeAnalysis";
 
-/*Pages*/
 import JobMatch from "./pages/JobMatch";
 import JobMatchHistory from "./pages/JobMatchHistory";
 import JobMatchAnalytics from "./pages/JobMatchAnalytics";
-import DashboardLayout from "./components/layout/DashboardLayout";
 
 /* Components */
-
 import ProtectedRoute from "./components/ProtectedRoute";
+import MyResumes from "./pages/MyResumes";
 
-function Layout({ isLoggedIn, setIsLoggedIn }) {
-  const location = useLocation();
-
-  // Public routes
-  const publicRoutes = ["/", "/login", "/register"];
-
-  const isPublicPage = publicRoutes.includes(location.pathname);
-
+function AppRoutes({ setIsLoggedIn }) {
   return (
-    <>
-      <Routes>
-        {/* Public */}
-        <Route path="/" element={<LandingPage />} />
-        <Route
-          path="/login"
-          element={<Login setIsLoggedIn={setIsLoggedIn} />}
-        />
-        <Route path="/register" element={<Register />} />
-        {/* Protected */}
-        <Route
-          path="/dashboard"
-          element={
-            <ProtectedRoute>
-              <Dashboard />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/upload-resume"
-          element={
-            <ProtectedRoute>
-              <UploadResume />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/interview-selection"
-          element={
-            <ProtectedRoute>
-              <InterviewSelection />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/interview-selection"
-          element={
-            <ProtectedRoute>
-              <InterviewSelection />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/mock-interview"
-          element={
-            <ProtectedRoute>
-              <MockInterview />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/interview-result"
-          element={
-            <ProtectedRoute>
-              <InterviewResult />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/result"
-          element={
-            <ProtectedRoute>
-              <ResultFeedback />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/career-guidance"
-          element={
-            <ProtectedRoute>
-              <CareerGuidance />
-            </ProtectedRoute>
-          }
-        />
-        <Route path="/interview-history" element={<InterviewHistory />} />
-        <Route path="/analytics" element={<PerformanceAnalytics />} />
-        <Route path="/my-resumes" element={<ResumeDashboard />} />
-        <Route path="/resume-analysis/:id" element={<ResumeAnalysis />} />
-        <Route path="/job-match" element={<JobMatch />} />
-        <Route path="/job-match-history" element={<JobMatchHistory />} />
-        <Route path="/job-match-analytics" element={<JobMatchAnalytics />} />
-      </Routes>
-    </>
+    <Routes>
+      {/* Public */}
+      <Route path="/" element={<LandingPage />} />
+      <Route path="/login" element={<Login setIsLoggedIn={setIsLoggedIn} />} />
+      <Route path="/register" element={<Register />} />
+
+      {/* Protected */}
+      <Route
+        path="/dashboard"
+        element={
+          <ProtectedRoute>
+            <Dashboard />
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/upload-resume"
+        element={
+          <ProtectedRoute>
+            <UploadResume />
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/interview-selection"
+        element={
+          <ProtectedRoute>
+            <InterviewSelection />
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/mock-interview"
+        element={
+          <ProtectedRoute>
+            <MockInterview />
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/interview-result"
+        element={
+          <ProtectedRoute>
+            <InterviewResult />
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/result"
+        element={
+          <ProtectedRoute>
+            <ResultFeedback />
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/career-guidance"
+        element={
+          <ProtectedRoute>
+            <CareerGuidance />
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/interview-history"
+        element={
+          <ProtectedRoute>
+            <InterviewHistory />
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/analytics"
+        element={
+          <ProtectedRoute>
+            <PerformanceAnalytics />
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/resume-analysis/:id"
+        element={
+          <ProtectedRoute>
+            <ResumeAnalysis />
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/job-match"
+        element={
+          <ProtectedRoute>
+            <JobMatch />
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/job-match-history"
+        element={
+          <ProtectedRoute>
+            <JobMatchHistory />
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/job-match-analytics"
+        element={
+          <ProtectedRoute>
+            <JobMatchAnalytics />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/my-resumes"
+        element={
+          <ProtectedRoute>
+            <MyResumes />
+          </ProtectedRoute>
+        }
+      />
+    </Routes>
   );
 }
 
@@ -141,7 +175,7 @@ function MainApp() {
 
   return (
     <Router>
-      <Layout isLoggedIn={isLoggedIn} setIsLoggedIn={setIsLoggedIn} />
+      <AppRoutes setIsLoggedIn={setIsLoggedIn} />
     </Router>
   );
 }

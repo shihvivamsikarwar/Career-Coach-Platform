@@ -8,6 +8,8 @@ const authRoutes = require("./routes/authRoutes");
 const interviewRoutes = require("./routes/interviewRoutes");
 const resumeRoutes = require("./routes/resumeRoutes");
 const jobMatchRoutes = require("./routes/jobMatchRoutes");
+const dashboardRoutes = require("./routes/dashboardRoutes");
+const aiRoutes = require("./routes/aiRoutes");
 
 const app = express();
 
@@ -29,6 +31,9 @@ app.use("/api/auth", authRoutes);
 app.use("/api/interview", interviewRoutes);
 app.use("/api/resume", resumeRoutes);
 app.use("/api/job", jobMatchRoutes);
+app.use("/api/dashboard", dashboardRoutes);
+app.use("/api", aiRoutes);
+app.use("/uploads", express.static("uploads"));
 
 // ===============================
 // TEST ROUTE

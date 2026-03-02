@@ -1,19 +1,46 @@
 const mongoose = require("mongoose");
 
-const ResumeSchema = new mongoose.Schema(
+const resumeSchema = new mongoose.Schema(
   {
-    userId: { type: mongoose.Schema.Types.ObjectId, required: true },
+    userId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      required: true,
+    },
 
     fileName: String,
     fileUrl: String,
 
-    score: Number,
-    atsScore: Number,
-    skills: [String],
+    // ⭐ ROOT FIELDS (dashboard use)
+    score: {
+      type: Number,
+      default: 0,
+    },
 
-    analysis: Object,
+    atsScore: {
+      type: Number,
+      default: 0,
+    },
 
-    status: String,
+    skills: {
+      type: [String],
+      default: [],
+    },
+
+    // ⭐ FULL AI ANALYSIS
+    analysis: {
+      type: Object,
+      default: {},
+    },
+
+    status: {
+      type: String,
+      default: "pending",
+    },
   },
-  { timestamps: true }
+  {
+    timestamps: true,
+  }
 );
+
+module.exports = mongoose.model("Resume", resumeSchema);

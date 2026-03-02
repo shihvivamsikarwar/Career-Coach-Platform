@@ -1,33 +1,30 @@
-import React, { useEffect, useState, useCallback } from "react";
+import React, { useEffect, useState } from "react";
 import axios from "axios";
+import DashboardLayout from "../layout/DashboardLayout";
+import { useNavigate } from "react-router-dom";
 
-function ResumeDashboard() {
+function MyResumes() {
   const [resumes, setResumes] = useState([]);
+  const navigate = useNavigate();
 
   const userId = localStorage.getItem("userId");
 
-  // ==============================
-  // FETCH RESUMES
-  // ==============================
-  const fetchResumes = useCallback(async () => {
+  useEffect(() => {
+    fetchResumes();
+  }, []);
+
+  const fetchResumes = async () => {
     try {
       const res = await axios.get(
         `http://localhost:5000/api/resume/user/${userId}`
       );
 
-      setResumes(res.data); // ✅ FIXED
+      setResumes(res.data || []);
     } catch (error) {
-      console.error(error);
+      console.error("Fetch resume error:", error);
     }
-  }, [userId]);
+  };
 
-  useEffect(() => {
-    fetchResumes();
-  }, [fetchResumes]);
-
-  // ==============================
-  // DELETE
-  // ==============================
   const handleDelete = async (id) => {
     if (!window.confirm("Delete this resume?")) return;
 
@@ -39,58 +36,72 @@ function ResumeDashboard() {
     }
   };
 
-  return (
-    <div
-      className="min-vh-100"
-      style={{
-        background: "linear-gradient(135deg, #f6f4ff, #e9e4ff)",
-      }}
-    >
-      <div className="container py-5">
-        <h2 className="fw-bold mb-4">📄 My Resumes</h2>
+  // ✅ DOWNLOAD FUNCTION
+  const handleDownload = (fileUrl) => {
+    if (!fileUrl) return;
 
-        <div className="row g-4">
+    const cleanPath = fileUrl.replace(/\\/g, "/");
+    const fullUrl = `http://localhost:5000/${cleanPath}`;
+
+    window.open(fullUrl, "_blank");
+  };
+
+  return (
+    <DashboardLayout>
+      <div className="container mt-4">
+        <h3 className="mb-4">📄 My Resumes</h3>
+
+        <div className="row">
           {resumes.map((resume) => (
-            <div key={resume._id} className="col-md-4">
-              <div className="card shadow-lg border-0 rounded-4 h-100">
+            <div key={resume._id} className="col-md-4 mb-4">
+              <div className="card shadow-sm border-0 rounded-4 h-100">
                 <div className="card-body">
                   <h5 className="fw-bold mb-2">
-                    📄 {resume.fileUrl?.split("\\").pop()}
+                    📄 {resume.fileName || "Resume"}
                   </h5>
 
                   <p className="text-muted small">
                     Uploaded: {new Date(resume.createdAt).toLocaleDateString()}
                   </p>
 
-                  {/* SCORE */}
                   <div className="my-3">
                     <span className="badge bg-success fs-6">
-                      Score: {resume.aiAnalysis?.score || 0}%
+                      Score: {resume?.score ?? 0}%
                     </span>
                   </div>
 
-                  {/* SKILLS */}
                   <div className="mb-3">
                     <strong>Skills:</strong>
                     <div>
-                      {resume.aiAnalysis?.skills?.map((skill, i) => (
-                        <span key={i} className="badge bg-primary me-1 mb-1">
-                          {skill}
+                      {resume?.skills?.length > 0 ? (
+                        resume.skills.map((skill, i) => (
+                          <span key={i} className="badge bg-primary me-1 mb-1">
+                            {skill}
+                          </span>
+                        ))
+                      ) : (
+                        <span className="text-muted ms-2">
+                          No skills detected
                         </span>
-                      ))}
+                      )}
                     </div>
                   </div>
 
-                  {/* ACTIONS */}
+                  {/* BUTTONS */}
                   <div className="d-flex justify-content-between">
-                    <a
-                      href={`http://localhost:5000/${resume.fileUrl}`}
-                      target="_blank"
-                      rel="noreferrer"
+                    <button
                       className="btn btn-outline-primary btn-sm"
+                      onClick={() => navigate(`/resume-analysis/${resume._id}`)}
+                    >
+                      View
+                    </button>
+
+                    <button
+                      className="btn btn-outline-success btn-sm"
+                      onClick={() => handleDownload(resume.fileUrl)}
                     >
                       Download
-                    </a>
+                    </button>
 
                     <button
                       className="btn btn-outline-danger btn-sm"
@@ -111,8 +122,8 @@ function ResumeDashboard() {
           </div>
         )}
       </div>
-    </div>
+    </DashboardLayout>
   );
 }
 
-export default ResumeDashboard;
+export default MyResumes;

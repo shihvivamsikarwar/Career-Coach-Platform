@@ -130,3 +130,68 @@ ${resumeText}
     };
   }
 };
+
+// ============================================
+// AI CAREER RECOMMENDATIONS
+// ============================================
+
+exports.generateCareerRecommendations = async (data) => {
+  try {
+    if (!process.env.OPENROUTER_API_KEY) {
+      throw new Error("Missing OPENROUTER_API_KEY");
+    }
+
+    const prompt = `
+You are an AI career coach.
+
+Return ONLY JSON:
+
+{
+  "recommendedRole": "",
+  "strengths": [],
+  "weakAreas": [],
+  "nextSteps": [],
+  "confidence": number
+}
+
+User Data:
+${JSON.stringify(data)}
+`;
+
+    const response = await axios.post(
+      "https://openrouter.ai/api/v1/chat/completions",
+      {
+        model: "openai/gpt-4o-mini",
+        messages: [
+          { role: "system", content: "You are an expert career coach." },
+          { role: "user", content: prompt },
+        ],
+        temperature: 0.3,
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${process.env.OPENROUTER_API_KEY}`,
+          "Content-Type": "application/json",
+        },
+      }
+    );
+
+    const content = response.data.choices[0].message.content;
+
+    const jsonMatch = content.match(/\{[\s\S]*\}/);
+
+    if (!jsonMatch) throw new Error("Invalid AI JSON");
+
+    return JSON.parse(jsonMatch[0]);
+  } catch (error) {
+    console.error("AI Career Error:", error.message);
+
+    return {
+      recommendedRole: "Software Developer",
+      strengths: ["Problem solving"],
+      weakAreas: ["Consistency"],
+      nextSteps: ["Practice interviews", "Improve projects"],
+      confidence: 50,
+    };
+  }
+};
