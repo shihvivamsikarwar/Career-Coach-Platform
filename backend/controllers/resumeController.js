@@ -1,6 +1,6 @@
 const mongoose = require("mongoose");
 const Resume = require("../models/Resume");
-const { analyzeResumeWithAI } = require("../services/aiService");
+const callOpenRouter = require("../services/openRouterClient");
 
 // ===============================
 // UPLOAD RESUME + AI ANALYSIS

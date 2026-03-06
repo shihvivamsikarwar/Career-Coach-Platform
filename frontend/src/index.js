@@ -12,9 +12,6 @@ import Register from "./authPage/Register";
 /* Protected Pages */
 import Dashboard from "./pages/Dashboard";
 import UploadResume from "./pages/UploadResume";
-import MockInterview from "./pages/MockInterview";
-import InterviewHistory from "./pages/InterviewHistory";
-import InterviewResult from "./pages/InterviewResult";
 import ResultFeedback from "./resultFeedback/ResultFeedback";
 import CareerGuidance from "./pages/CareerGuidance";
 import PerformanceAnalytics from "./analytics/PerformanceAnalytics";
@@ -33,7 +30,10 @@ import MyResumes from "./pages/MyResumes";
 
 /*Interviews Pages*/
 import InterviewHome from "./pages/InterviewHome";
-import InterviewSetup from "./pages/InterviewSetup";
+import MockInterview from "./pages/MockInterview";
+import InterviewHistory from "./pages/InterviewHistory";
+import InterviewResult from "./pages/InterviewResult";
+import InterviewReport from "./pages/InterviewReport";
 
 function AppRoutes({ setIsLoggedIn }) {
   return (
@@ -63,24 +63,6 @@ function AppRoutes({ setIsLoggedIn }) {
       />
 
       <Route
-        path="/mock-interview"
-        element={
-          <ProtectedRoute>
-            <MockInterview />
-          </ProtectedRoute>
-        }
-      />
-
-      <Route
-        path="/interview-result"
-        element={
-          <ProtectedRoute>
-            <InterviewResult />
-          </ProtectedRoute>
-        }
-      />
-
-      <Route
         path="/result"
         element={
           <ProtectedRoute>
@@ -94,15 +76,6 @@ function AppRoutes({ setIsLoggedIn }) {
         element={
           <ProtectedRoute>
             <CareerGuidance />
-          </ProtectedRoute>
-        }
-      />
-
-      <Route
-        path="/interview-history"
-        element={
-          <ProtectedRoute>
-            <InterviewHistory />
           </ProtectedRoute>
         }
       />
@@ -162,11 +135,37 @@ function AppRoutes({ setIsLoggedIn }) {
           </ProtectedRoute>
         }
       />
+
       <Route
-        path="/interview/setup/:domain"
+        path="/mock-interview"
         element={
           <ProtectedRoute>
-            <InterviewSetup />
+            <MockInterview />
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/interview-result"
+        element={
+          <ProtectedRoute>
+            <InterviewResult />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/interview-history"
+        element={
+          <ProtectedRoute>
+            <InterviewHistory />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/interview-report"
+        element={
+          <ProtectedRoute>
+            <InterviewReport />
           </ProtectedRoute>
         }
       />

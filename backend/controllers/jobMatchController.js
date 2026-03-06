@@ -5,7 +5,7 @@ const fs = require("fs");
 const pdfParse = require("pdf-parse");
 const mongoose = require("mongoose");
 
-const { analyzeJobMatch } = require("../services/aiJobMatchService");
+const { analyzeJobMatch } = require("../services/openRouterClient");
 
 // ======================================================
 // MATCH JOB WITH LATEST RESUME
