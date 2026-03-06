@@ -1,72 +1,74 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
+import "../styles/interviewHistory.css";
 
 function InterviewHistory() {
   const [history, setHistory] = useState([]);
 
-  useEffect(() => {
-    const userId = localStorage.getItem("userId");
+  const userId = localStorage.getItem("userId");
+  const navigate = useNavigate();
 
-    if (!userId) {
-      alert("Please login first");
-      return;
+  useEffect(() => {
+    if (!userId) return;
+
+    async function loadHistory() {
+      try {
+        const res = await axios.get(
+          `http://localhost:5000/api/interview/history/${userId}`
+        );
+
+        setHistory(res.data.history || []);
+      } catch {
+        console.log("Failed to load history");
+      }
     }
 
-    axios
-      .get(`http://localhost:5000/api/interview/history/${userId}`)
-      .then((res) => {
-        setHistory(res.data.history);
-      })
-      .catch((err) => {
-        console.error(err);
-        alert("Failed to fetch history");
-      });
-  }, []);
+    loadHistory();
+  }, [userId]);
 
   return (
-    <div className="container mt-5">
-      <h2 className="mb-4 text-center">Interview History</h2>
+    <div className="history-container">
+      <button
+        className="back-btn"
+        onClick={() => navigate("/interview-selection")}
+      >
+        ←Back to Interviews
+      </button>
+      <h2 className="history-title">Interview History</h2>
 
       {history.length === 0 ? (
-        <p className="text-center">No interview attempts yet.</p>
+        <p className="no-history">No interviews taken yet</p>
       ) : (
-        <div className="table-responsive">
-          <table className="table table-bordered table-striped">
-            <thead className="table-dark">
-              <tr>
-                <th>Domain</th>
-                <th>Score</th>
-                <th>Grade</th>
-                <th>Date</th>
-              </tr>
-            </thead>
-            <tbody>
-              {history.map((item, index) => (
-                <tr key={index}>
-                  <td>{item.domain}</td>
-                  <td>{item.score}</td>
-                  <td>
-                    <span
-                      className={`badge ${
-                        item.grade === "A"
-                          ? "bg-success"
-                          : item.grade === "B"
-                          ? "bg-primary"
-                          : item.grade === "C"
-                          ? "bg-warning text-dark"
-                          : item.grade === "D"
-                          ? "bg-danger"
-                          : "bg-dark"
-                      }`}
-                    >
-                      {item.grade}
-                    </span>
-                  </td>
-                  <td>{new Date(item.date).toLocaleDateString()}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+        <div className="history-grid">
+          {history.map((item, index) => (
+            <div
+              className="history-card"
+              key={index}
+              onClick={() => navigate("/interview-report", { state: item })}
+            >
+              <div className="history-header">
+                <h3>{item.domain.replace("-", " ").toUpperCase()}</h3>
+                <span className="difficulty">{item.difficulty}</span>
+              </div>
+
+              <div className="history-body">
+                <div className="score-box">
+                  <span>Score</span>
+                  <h2>{item.score}</h2>
+                </div>
+
+                <div className="grade-box">
+                  <span>Grade</span>
+                  <h4>{item.grade || "N/A"}</h4>
+                </div>
+              </div>
+
+              <div className="history-footer">
+                {new Date(item.createdAt).toLocaleDateString()}
+              </div>
+            </div>
+          ))}
         </div>
       )}
     </div>

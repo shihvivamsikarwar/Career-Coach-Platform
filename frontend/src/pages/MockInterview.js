@@ -1,119 +1,320 @@
-import React, { useState, useEffect } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
-import DashboardLayout from "../layout/DashboardLayout";
+import React, { useEffect, useState, useRef } from "react";
+import axios from "axios";
+import { useNavigate, useLocation } from "react-router-dom";
+import "../styles/mockInterview.css";
 
 function MockInterview() {
-  const location = useLocation();
   const navigate = useNavigate();
+  const location = useLocation();
 
-  const { domain, difficulty, questionsCount, mode } = location.state || {};
+  const domain = location.state?.domain;
 
-  // Sample Questions (temporary)
-  const sampleQuestions = [
-    "Explain OOP principles.",
-    "What is REST API?",
-    "Difference between SQL and NoSQL?",
-    "What is React lifecycle?",
-    "Explain asynchronous programming.",
-  ];
+  const [questions, setQuestions] = useState([]);
+  const [answers, setAnswers] = useState([]);
+  const [current, setCurrent] = useState(0);
 
-  const questions = sampleQuestions.slice(0, questionsCount || 5);
+  const [timeLeft, setTimeLeft] = useState(90);
+  const [warnings, setWarnings] = useState(0);
 
-  const [currentIndex, setCurrentIndex] = useState(0);
-  const [answers, setAnswers] = useState({});
-  const [timeLeft, setTimeLeft] = useState(300); // 5 min
+  const [loading, setLoading] = useState(true);
+  const [loadingNext, setLoadingNext] = useState(false);
 
-  // Timer
+  const [warningMessage, setWarningMessage] = useState("");
+  const [warningLock, setWarningLock] = useState(false);
+
+  const timerRef = useRef(null);
+
+  const MAX_QUESTIONS = 10;
+
+  // ================= START INTERVIEW =================
+
   useEffect(() => {
-    const timer = setInterval(() => {
+    if (!domain) {
+      navigate("/interview");
+      return;
+    }
+
+    async function startInterview() {
+      try {
+        const res = await axios.post(
+          "http://localhost:5000/api/interview/start",
+          {
+            userId: localStorage.getItem("userId"),
+            domain,
+          }
+        );
+
+        const firstQuestion =
+          res.data.questionText || res.data.questions?.[0]?.questionText;
+
+        setQuestions([firstQuestion]);
+        setAnswers([""]);
+      } catch {
+        alert("Failed to start interview");
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    startInterview();
+  }, []);
+
+  // ================= TIMER =================
+
+  useEffect(() => {
+    if (!questions.length) return;
+
+    clearInterval(timerRef.current);
+
+    timerRef.current = setInterval(() => {
       setTimeLeft((prev) => {
         if (prev <= 1) {
-          clearInterval(timer);
-          handleSubmit();
+          clearInterval(timerRef.current);
+
+          handleNext(true);
+
+          return 90;
         }
+
         return prev - 1;
       });
     }, 1000);
 
-    return () => clearInterval(timer);
+    return () => clearInterval(timerRef.current);
+  }, [current, questions]);
+
+  // ================= WARNING SYSTEM =================
+
+  const triggerWarning = (message) => {
+    if (warningLock) return;
+
+    setWarningLock(true);
+
+    setWarnings((prev) => {
+      const newCount = Math.min(prev + 1, 3);
+      setWarningMessage(`${message} | Warning ${newCount}/3`);
+
+      setTimeout(() => {
+        setWarningMessage("");
+        setWarningLock(false);
+      }, 3000);
+
+      if (newCount >= 3) {
+        handleSubmit(true);
+      }
+
+      return newCount;
+    });
+  };
+
+  // ================= TAB SWITCH =================
+
+  useEffect(() => {
+    const handleVisibility = () => {
+      if (document.hidden) {
+        triggerWarning("Tab switching detected");
+      }
+    };
+
+    document.addEventListener("visibilitychange", handleVisibility);
+
+    return () =>
+      document.removeEventListener("visibilitychange", handleVisibility);
   }, []);
 
-  const handleAnswerChange = (e) => {
-    setAnswers({
-      ...answers,
-      [currentIndex]: e.target.value,
-    });
+  // ================= WINDOW BLUR =================
+
+  useEffect(() => {
+    const handleBlur = () => {
+      if (!document.hidden) {
+        triggerWarning("Window focus lost");
+      }
+    };
+
+    window.addEventListener("blur", handleBlur);
+
+    return () => window.removeEventListener("blur", handleBlur);
+  }, []);
+
+  // ================= BLOCK DEVTOOLS =================
+
+  useEffect(() => {
+    const handleKey = (e) => {
+      if (
+        e.key === "F12" ||
+        (e.ctrlKey && e.shiftKey && e.key === "I") ||
+        (e.ctrlKey && e.shiftKey && e.key === "J") ||
+        (e.ctrlKey && e.key === "u")
+      ) {
+        e.preventDefault();
+        triggerWarning("Developer tools blocked");
+      }
+    };
+
+    document.addEventListener("keydown", handleKey);
+
+    return () => document.removeEventListener("keydown", handleKey);
+  }, []);
+
+  // ================= BLOCK COPY / PASTE =================
+
+  useEffect(() => {
+    const blockCopy = (e) => {
+      e.preventDefault();
+      triggerWarning("Copy not allowed");
+    };
+
+    const blockPaste = (e) => {
+      e.preventDefault();
+      triggerWarning("Paste not allowed");
+    };
+
+    const blockRightClick = (e) => e.preventDefault();
+
+    document.addEventListener("copy", blockCopy);
+    document.addEventListener("paste", blockPaste);
+    document.addEventListener("contextmenu", blockRightClick);
+
+    return () => {
+      document.removeEventListener("copy", blockCopy);
+      document.removeEventListener("paste", blockPaste);
+      document.removeEventListener("contextmenu", blockRightClick);
+    };
+  }, []);
+
+  // ================= ANSWER =================
+
+  const handleChange = (value) => {
+    const updated = [...answers];
+    updated[current] = value;
+    setAnswers(updated);
   };
 
-  const handleNext = () => {
-    if (currentIndex < questions.length - 1) {
-      setCurrentIndex(currentIndex + 1);
+  // ================= NEXT QUESTION =================
+
+  const handleNext = async (auto = false) => {
+    if (loadingNext) return;
+
+    if (questions.length >= MAX_QUESTIONS) {
+      handleSubmit();
+      return;
+    }
+
+    setLoadingNext(true);
+
+    try {
+      const res = await axios.post(
+        "http://localhost:5000/api/interview/next-question",
+        {
+          domain,
+          previousQuestion: questions[current],
+          previousAnswer: answers[current]?.trim() || "No answer provided",
+        }
+      );
+
+      const nextQuestion =
+        res?.data?.questionText || "Explain this concept in detail.";
+
+      setQuestions((prev) => [...prev, nextQuestion]);
+      setAnswers((prev) => [...prev, ""]);
+
+      setCurrent((prev) => prev + 1);
+      setTimeLeft(90);
+    } catch {
+      alert("Failed to generate next question");
+    }
+
+    setLoadingNext(false);
+  };
+
+  // ================= SUBMIT =================
+
+  const handleSubmit = async (auto = false) => {
+    clearInterval(timerRef.current);
+
+    try {
+      const res = await axios.post(
+        "http://localhost:5000/api/interview/submit",
+        {
+          userId: localStorage.getItem("userId"),
+          domain,
+          difficulty: "easy",
+          questions,
+          answers,
+          warnings,
+          autoSubmitted: auto,
+        }
+      );
+
+      navigate("/interview-result", { state: res.data });
+    } catch {
+      alert("Submission failed");
     }
   };
 
-  const handlePrev = () => {
-    if (currentIndex > 0) {
-      setCurrentIndex(currentIndex - 1);
-    }
-  };
+  if (loading) {
+    return <div className="loading-screen">Preparing AI Interview...</div>;
+  }
 
-  const handleSubmit = () => {
-    navigate("/interview-result", {
-      state: { answers, questions, domain },
-    });
-  };
+  const q = questions[current];
 
   return (
-    <DashboardLayout>
-      <div className="container py-5">
-        <h3 className="mb-3">
-          Domain: {domain?.replace(/-/g, " ").toUpperCase()}
-        </h3>
+    <div className="interview-container">
+      <div className="interview-header">
+        <h2>{domain.toUpperCase()} INTERVIEW</h2>
 
-        <div className="card p-4 shadow rounded-4">
-          {/* Timer */}
-          <div className="d-flex justify-content-between mb-3">
-            <span>
-              Question {currentIndex + 1} / {questions.length}
-            </span>
-            <span className="text-danger fw-bold">⏳ {timeLeft}s</span>
+        <div className="interview-stats">
+          <span>⏱ {timeLeft}s</span>
+          <span>⚠ {warnings}/3</span>
+          <span>Q {current + 1}</span>
+          <span>
+            Progess:{current + 1}/{MAX_QUESTIONS}
+          </span>
+        </div>
+      </div>
+
+      <div className="interview-body">
+        <div className="question-main">
+          <div className="question-card">
+            <h3>Question {current + 1}</h3>
+
+            <p className="question-text">{q}</p>
+
+            <textarea
+              className="answer-box"
+              value={answers[current] || ""}
+              onChange={(e) => handleChange(e.target.value)}
+              placeholder="Type your answer here..."
+            />
+            <div className="char-count">
+              {answers[current]?.length || 0} characters
+            </div>
           </div>
 
-          {/* Question */}
-          <h5>{questions[currentIndex]}</h5>
-
-          {/* Answer */}
-          <textarea
-            className="form-control mt-3"
-            rows="4"
-            value={answers[currentIndex] || ""}
-            onChange={handleAnswerChange}
-            placeholder="Type your answer here..."
-          />
-
-          {/* Buttons */}
-          <div className="d-flex justify-content-between mt-4">
+          <div className="nav-buttons">
             <button
-              className="btn btn-secondary"
-              onClick={handlePrev}
-              disabled={currentIndex === 0}
+              onClick={() =>
+                questions.length >= MAX_QUESTIONS
+                  ? handleSubmit()
+                  : handleNext()
+              }
+              className="next-btn"
+              disabled={loadingNext}
             >
-              Previous
+              {loadingNext
+                ? "Loading..."
+                : questions.length >= MAX_QUESTIONS
+                ? "Submit Interview"
+                : "Next Question"}
             </button>
-
-            {currentIndex === questions.length - 1 ? (
-              <button className="btn btn-success" onClick={handleSubmit}>
-                Submit Interview
-              </button>
-            ) : (
-              <button className="btn btn-primary" onClick={handleNext}>
-                Next
-              </button>
-            )}
           </div>
         </div>
       </div>
-    </DashboardLayout>
+
+      {warningMessage && (
+        <div className="warning-popup">⚠ {warningMessage}</div>
+      )}
+    </div>
   );
 }
 

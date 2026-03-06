@@ -1,294 +1,194 @@
 const express = require("express");
 const router = express.Router();
-const mongoose = require("mongoose");
-const InterviewQuestion = require("../models/InterviewQuestion");
+
+const callOpenRouter = require("../services/openRouterClient");
 const InterviewResult = require("../models/InterviewResult");
-const InterviewSession = require("../models/InterviewSession");
 
-// =============================
-// GET QUESTIONS BY DOMAIN
-// =============================
-router.get("/questions/:domain", async (req, res) => {
+// ================= START INTERVIEW =================
+
+router.post("/start", async (req, res) => {
   try {
-    const { domain } = req.params;
+    const { domain } = req.body;
 
-    const questions = await InterviewQuestion.find({ domain });
+    if (!domain) {
+      return res.status(400).json({
+        message: "Domain is required",
+      });
+    }
 
-    res.status(200).json({ questions });
+    const systemPrompt = `
+You are a professional technical interviewer.
+
+Generate the FIRST interview question.
+
+Domain: ${domain}
+
+Return JSON:
+
+{
+ "questionText":""
+}
+`;
+
+    const aiData = await callOpenRouter(systemPrompt, "");
+
+    res.json({
+      questionText:
+        aiData?.questionText || "Explain core concepts of this domain.",
+    });
   } catch (error) {
-    console.error("Error fetching questions:", error);
-    res.status(500).json({ message: "Failed to fetch questions" });
+    console.error("Start Interview Error:", error);
+
+    res.status(500).json({
+      message: "Failed to start interview",
+    });
   }
 });
 
-// =============================
-// GET QUESTIONS BY DOMAIN + DIFFICULTY
-// =============================
-router.get("/questions/:domain/:difficulty", async (req, res) => {
+// ================= NEXT QUESTION =================
+
+router.post("/next-question", async (req, res) => {
   try {
-    const { domain, difficulty } = req.params;
+    const { domain, previousQuestion, previousAnswer } = req.body;
 
-    const questions = await InterviewQuestion.find({
-      domain,
-      difficulty,
-    }).limit(5);
+    const systemPrompt = `
+You are a senior technical interviewer.
 
-    res.status(200).json({ questions });
+Generate the NEXT interview question based on the candidate's previous answer.
+
+Domain: ${domain}
+
+If the answer is strong → increase difficulty
+If weak → ask concept question
+
+Return JSON:
+
+{
+ "questionText": ""
+}
+`;
+
+    const userPrompt = `
+Previous Question:
+${previousQuestion}
+
+Candidate Answer:
+${previousAnswer}
+`;
+
+    const aiData = await callOpenRouter(systemPrompt, userPrompt);
+
+    res.json({
+      questionText:
+        aiData?.questionText || "Explain this concept in more detail.",
+    });
   } catch (error) {
-    console.error("Error fetching difficulty questions:", error);
-    res.status(500).json({ message: "Failed to fetch questions" });
+    console.error("Next Question Error:", error);
+
+    res.status(500).json({
+      message: "Failed to generate next question",
+    });
   }
 });
 
-// =============================
-// SUBMIT INTERVIEW
-// =============================
+// ================= SUBMIT INTERVIEW =================
+
 router.post("/submit", async (req, res) => {
   try {
-    const { answers, domain, difficulty, userId } = req.body;
+    const {
+      userId,
+      domain,
+      difficulty = "easy",
+      questions = [],
+      answers = [],
+    } = req.body;
 
-    if (!userId) {
-      return res.status(400).json({ message: "User ID missing" });
-    }
-
-    const questions = await InterviewQuestion.find({ domain, difficulty });
-
-    if (!questions || questions.length === 0) {
-      return res.status(400).json({ message: "No questions found" });
-    }
-
-    let totalScore = 0;
-    let detailedFeedback = [];
-
-    questions.forEach((question, index) => {
-      const userAnswer = answers[index]?.toLowerCase() || "";
-      const keywords = question.expectedKeywords;
-
-      let matchCount = 0;
-
-      keywords.forEach((keyword) => {
-        if (userAnswer.includes(keyword.toLowerCase())) {
-          matchCount++;
-        }
+    if (!questions || !answers) {
+      return res.status(400).json({
+        message: "Questions or answers missing",
       });
-
-      const keywordWeight = 60;
-      const structureWeight = 20;
-      const clarityWeight = 20;
-
-      const keywordScore = (matchCount / keywords.length) * keywordWeight;
-
-      const structureScore =
-        userAnswer.length > 120 ? 20 : userAnswer.length > 60 ? 10 : 5;
-
-      const clarityScore =
-        userAnswer.split(" ").length > 20
-          ? 20
-          : userAnswer.split(" ").length > 10
-          ? 10
-          : 5;
-
-      const questionScore = keywordScore + structureScore + clarityScore;
-
-      totalScore += questionScore;
-
-      const missingKeywords = keywords.filter(
-        (keyword) => !userAnswer.includes(keyword.toLowerCase())
-      );
-
-      detailedFeedback.push({
-        question: question.questionText,
-        score: Math.round(questionScore),
-        missingConcepts: missingKeywords,
-      });
-    });
-
-    const finalScore = Math.round(totalScore / questions.length);
-
-    // Grade Logic
-    let grade;
-    let performanceMessage;
-
-    if (finalScore >= 85) {
-      grade = "A";
-      performanceMessage = "Excellent performance. You are interview ready!";
-    } else if (finalScore >= 70) {
-      grade = "B";
-      performanceMessage = "Good performance. Minor improvements needed.";
-    } else if (finalScore >= 55) {
-      grade = "C";
-      performanceMessage = "Average performance. Improve conceptual clarity.";
-    } else if (finalScore >= 40) {
-      grade = "D";
-      performanceMessage = "Below average. Practice more.";
-    } else {
-      grade = "F";
-      performanceMessage = "Poor performance. Strong revision required.";
     }
 
-    // Adaptive Difficulty
-    let nextDifficulty;
-    if (finalScore <= 50) nextDifficulty = "easy";
-    else if (finalScore <= 75) nextDifficulty = "medium";
-    else nextDifficulty = "hard";
+    const systemPrompt = `
+You are a professional interviewer.
 
-    // =============================
-    // 🔥 SAVE RESULT TO DATABASE
-    // =============================
+Evaluate the answers.
+
+Return JSON:
+
+{
+ "score": number,
+ "grade": "",
+ "strengths": [],
+ "weakAreas": [],
+ "improvements": [],
+ "finalFeedback": ""
+}
+`;
+
+    const userPrompt = `
+Questions:
+${questions.join("\n")}
+
+Answers:
+${answers.join("\n")}
+`;
+
+    const aiResult = await callOpenRouter(systemPrompt, userPrompt);
+
+    const safeResult = {
+      score: aiResult?.score || 0,
+      grade: aiResult?.grade || "N/A",
+      strengths: aiResult?.strengths || [],
+      weakAreas: aiResult?.weakAreas || [],
+      improvements: aiResult?.improvements || [],
+      finalFeedback: aiResult?.finalFeedback || "",
+    };
+
     await InterviewResult.create({
-      userId: new mongoose.Types.ObjectId(userId),
+      userId,
       domain,
       difficulty,
-      score: finalScore,
-      grade,
-      performanceMessage,
-      feedback: detailedFeedback,
+      score: safeResult.score,
+      grade: safeResult.grade,
+      strengths: safeResult.strengths,
+      weakAreas: safeResult.weakAreas,
+      improvements: safeResult.improvements,
+      questions,
+      answers,
+      feedback: safeResult,
     });
 
-    res.status(200).json({
-      score: finalScore,
-      grade,
-      performanceMessage,
-      feedback: detailedFeedback,
-      domain,
-      difficulty,
-      nextDifficulty,
-    });
+    res.json(safeResult);
   } catch (error) {
-    console.error("Evaluation error:", error);
-    res.status(500).json({ message: "Evaluation failed" });
+    console.error("Submit Error:", error);
+
+    res.status(500).json({
+      message: "Interview evaluation failed",
+    });
   }
 });
 
-// =============================
-// GET INTERVIEW HISTORY
-// =============================
+// ================= HISTORY =================
+
 router.get("/history/:userId", async (req, res) => {
   try {
     const { userId } = req.params;
 
-    const history = await InterviewResult.find({
-      userId: new mongoose.Types.ObjectId(userId),
-    }).sort({ date: -1 });
+    const history = await InterviewResult.find({ userId })
+      .sort({ createdAt: -1 })
+      .limit(20);
 
-    res.status(200).json({ history });
-  } catch (error) {
-    console.error("History fetch error:", error);
-    res.status(500).json({ message: "Failed to fetch history" });
-  }
-});
-
-// =============================
-// WEAK AREA ANALYSIS
-// =============================
-router.get("/weak-areas/:userId", async (req, res) => {
-  try {
-    const { userId } = req.params;
-
-    const history = await InterviewResult.find({
-      userId: new mongoose.Types.ObjectId(userId),
-    });
-
-    const conceptFrequency = {};
-
-    history.forEach((attempt) => {
-      attempt.feedback.forEach((item) => {
-        item.missingConcepts.forEach((concept) => {
-          conceptFrequency[concept] = (conceptFrequency[concept] || 0) + 1;
-        });
-      });
-    });
-
-    const sortedWeakAreas = Object.entries(conceptFrequency)
-      .sort((a, b) => b[1] - a[1])
-      .map(([concept, count]) => ({ concept, count }));
-
-    res.status(200).json({
-      weakAreas: sortedWeakAreas.slice(0, 5),
+    res.json({
+      success: true,
+      history,
     });
   } catch (error) {
-    console.error("Weak area error:", error);
-    res.status(500).json({ message: "Failed to analyze weak areas" });
-  }
-});
+    console.error("History Error:", error);
 
-// =============================
-// ADAPTIVE START
-// =============================
-router.post("/adaptive-start", async (req, res) => {
-  try {
-    const { userId, domain } = req.body;
-
-    if (!userId || !domain) {
-      return res.status(400).json({ message: "Missing data" });
-    }
-
-    const previousResults = await InterviewResult.find({
-      userId: new mongoose.Types.ObjectId(userId),
-      domain,
-    })
-      .sort({ date: -1 })
-      .limit(3);
-
-    let difficulty = "easy";
-
-    if (previousResults.length > 0) {
-      const total = previousResults.reduce((sum, item) => sum + item.score, 0);
-
-      const avgScore = total / previousResults.length;
-
-      if (avgScore >= 85) difficulty = "hard";
-      else if (avgScore >= 70) difficulty = "medium";
-      else difficulty = "easy";
-    }
-
-    const questions = await InterviewQuestion.find({
-      domain,
-      difficulty,
-    }).limit(5);
-
-    res.status(200).json({
-      difficulty,
-      questions,
+    res.status(500).json({
+      message: "Failed to fetch history",
     });
-  } catch (error) {
-    console.error("Adaptive start error:", error);
-    res.status(500).json({ message: "Adaptive interview failed" });
-  }
-});
-
-// =============================
-// START INTERVIEW SESSION
-// =============================
-router.post("/start-session", async (req, res) => {
-  try {
-    const { userId, domain, startingDifficulty } = req.body;
-
-    if (!userId || !domain || !startingDifficulty) {
-      return res.status(400).json({ message: "Missing data" });
-    }
-
-    const session = await InterviewSession.create({
-      userId,
-      domain,
-      levels: [],
-      status: "ongoing",
-    });
-
-    // Fetch 5 random questions
-    const questions = await InterviewQuestion.aggregate([
-      { $match: { domain, difficulty: startingDifficulty } },
-      { $sample: { size: 5 } },
-    ]);
-
-    res.status(200).json({
-      sessionId: session._id,
-      difficulty: startingDifficulty,
-      questions,
-    });
-  } catch (error) {
-    console.error("Session start error:", error);
-    res.status(500).json({ message: "Failed to start interview" });
   }
 });
 

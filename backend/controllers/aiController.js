@@ -2,7 +2,9 @@ const mongoose = require("mongoose");
 const InterviewResult = require("../models/InterviewResult");
 const Resume = require("../models/Resume");
 
-const { generateCareerRecommendations } = require("../services/aiService");
+const {
+  generateCareerRecommendations,
+} = require("../services/openRouterClient");
 
 exports.getAIRecommendations = async (req, res) => {
   try {
