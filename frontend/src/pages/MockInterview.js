@@ -2,6 +2,7 @@ import React, { useEffect, useState, useRef } from "react";
 import axios from "axios";
 import { useNavigate, useLocation } from "react-router-dom";
 import "../styles/mockInterview.css";
+import API from "../utils/api";
 
 function MockInterview() {
   const navigate = useNavigate();
@@ -36,13 +37,10 @@ function MockInterview() {
 
     async function startInterview() {
       try {
-        const res = await axios.post(
-          "http://localhost:5000/api/interview/start",
-          {
-            userId: localStorage.getItem("userId"),
-            domain,
-          }
-        );
+        const res = await axios.post(`${API}/api/interview/start`, {
+          userId: localStorage.getItem("userId"),
+          domain,
+        });
 
         const firstQuestion =
           res.data.questionText || res.data.questions?.[0]?.questionText;
@@ -203,14 +201,11 @@ function MockInterview() {
     setLoadingNext(true);
 
     try {
-      const res = await axios.post(
-        "http://localhost:5000/api/interview/next-question",
-        {
-          domain,
-          previousQuestion: questions[current],
-          previousAnswer: answers[current]?.trim() || "No answer provided",
-        }
-      );
+      const res = await axios.post("${API}/api/interview/next-question", {
+        domain,
+        previousQuestion: questions[current],
+        previousAnswer: answers[current]?.trim() || "No answer provided",
+      });
 
       const nextQuestion =
         res?.data?.questionText || "Explain this concept in detail.";
@@ -233,18 +228,15 @@ function MockInterview() {
     clearInterval(timerRef.current);
 
     try {
-      const res = await axios.post(
-        "http://localhost:5000/api/interview/submit",
-        {
-          userId: localStorage.getItem("userId"),
-          domain,
-          difficulty: "easy",
-          questions,
-          answers,
-          warnings,
-          autoSubmitted: auto,
-        }
-      );
+      const res = await axios.post("${API}/api/interview/submit", {
+        userId: localStorage.getItem("userId"),
+        domain,
+        difficulty: "easy",
+        questions,
+        answers,
+        warnings,
+        autoSubmitted: auto,
+      });
 
       navigate("/interview-result", { state: res.data });
     } catch {

@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import axios from "axios";
 import DashboardLayout from "../layout/DashboardLayout";
 import { useNavigate } from "react-router-dom";
+import API from "../utils/api";
 
 function UploadResume() {
   const [file, setFile] = useState(null);
@@ -20,13 +21,9 @@ function UploadResume() {
     try {
       setLoading(true);
 
-      const res = await axios.post(
-        "http://localhost:5000/api/resume/upload",
-        formData,
-        {
-          headers: { "Content-Type": "multipart/form-data" },
-        }
-      );
+      const res = await axios.post(`${API}/api/resume/upload`, formData, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
 
       alert("Resume uploaded successfully");
 

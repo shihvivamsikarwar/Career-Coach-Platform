@@ -1,8 +1,13 @@
 const express = require("express");
+const mongoose = require("mongoose");
 const router = express.Router();
 
 const callOpenRouter = require("../services/openRouterClient");
 const InterviewResult = require("../models/InterviewResult");
+const {
+  buildRecommendations,
+  buildWeakAreas,
+} = require("../utils/interviewInsights");
 
 // ================= START INTERVIEW =================
 
@@ -50,6 +55,12 @@ Return JSON:
 router.post("/next-question", async (req, res) => {
   try {
     const { domain, previousQuestion, previousAnswer } = req.body;
+
+    if (!domain || !previousQuestion || !previousAnswer) {
+      return res.status(400).json({
+        message: "Domain, previous question, and previous answer are required",
+      });
+    }
 
     const systemPrompt = `
 You are a senior technical interviewer.
@@ -103,9 +114,27 @@ router.post("/submit", async (req, res) => {
       answers = [],
     } = req.body;
 
-    if (!questions || !answers) {
+    if (!mongoose.Types.ObjectId.isValid(userId || "")) {
+      return res.status(400).json({
+        message: "Valid userId is required",
+      });
+    }
+
+    if (!domain) {
+      return res.status(400).json({
+        message: "Domain is required",
+      });
+    }
+
+    if (!Array.isArray(questions) || !Array.isArray(answers)) {
       return res.status(400).json({
         message: "Questions or answers missing",
+      });
+    }
+
+    if (!questions.length || !answers.length || questions.length !== answers.length) {
+      return res.status(400).json({
+        message: "Questions and answers must be non-empty and aligned",
       });
     }
 
@@ -146,9 +175,11 @@ ${answers.join("\n")}
     };
 
     await InterviewResult.create({
-      userId,
+      userId: new mongoose.Types.ObjectId(userId),
       domain,
-      difficulty,
+      difficulty: ["easy", "medium", "hard"].includes(difficulty)
+        ? difficulty
+        : "easy",
       score: safeResult.score,
       grade: safeResult.grade,
       strengths: safeResult.strengths,
@@ -175,7 +206,13 @@ router.get("/history/:userId", async (req, res) => {
   try {
     const { userId } = req.params;
 
-    const history = await InterviewResult.find({ userId })
+    if (!mongoose.Types.ObjectId.isValid(userId)) {
+      return res.status(400).json({ message: "Invalid userId" });
+    }
+
+    const history = await InterviewResult.find({
+      userId: new mongoose.Types.ObjectId(userId),
+    })
       .sort({ createdAt: -1 })
       .limit(20);
 
@@ -188,6 +225,58 @@ router.get("/history/:userId", async (req, res) => {
 
     res.status(500).json({
       message: "Failed to fetch history",
+    });
+  }
+});
+
+router.get("/weak-areas/:userId", async (req, res) => {
+  try {
+    const { userId } = req.params;
+
+    if (!mongoose.Types.ObjectId.isValid(userId)) {
+      return res.status(400).json({ message: "Invalid userId" });
+    }
+
+    const results = await InterviewResult.find({
+      userId: new mongoose.Types.ObjectId(userId),
+    }).select("weakAreas");
+
+    res.json({
+      success: true,
+      weakAreas: buildWeakAreas(results),
+    });
+  } catch (error) {
+    console.error("Weak areas error:", error);
+
+    res.status(500).json({
+      message: "Failed to fetch weak areas",
+    });
+  }
+});
+
+router.get("/recommendations/:userId", async (req, res) => {
+  try {
+    const { userId } = req.params;
+
+    if (!mongoose.Types.ObjectId.isValid(userId)) {
+      return res.status(400).json({ message: "Invalid userId" });
+    }
+
+    const results = await InterviewResult.find({
+      userId: new mongoose.Types.ObjectId(userId),
+    }).select("weakAreas");
+
+    const weakAreas = buildWeakAreas(results);
+
+    res.json({
+      success: true,
+      recommendations: buildRecommendations(weakAreas),
+    });
+  } catch (error) {
+    console.error("Recommendations error:", error);
+
+    res.status(500).json({
+      message: "Failed to fetch recommendations",
     });
   }
 });

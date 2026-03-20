@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import DashboardLayout from "../layout/DashboardLayout";
 import { useNavigate } from "react-router-dom";
+import API from "../utils/api";
 
 function MyResumes() {
   const [resumes, setResumes] = useState([]);
@@ -15,9 +16,7 @@ function MyResumes() {
 
   const fetchResumes = async () => {
     try {
-      const res = await axios.get(
-        `http://localhost:5000/api/resume/user/${userId}`
-      );
+      const res = await axios.get(`${API}/api/resume/user/${userId}`);
 
       setResumes(res.data || []);
     } catch (error) {
@@ -29,7 +28,7 @@ function MyResumes() {
     if (!window.confirm("Delete this resume?")) return;
 
     try {
-      await axios.delete(`http://localhost:5000/api/resume/${id}`);
+      await axios.delete(`${API}/api/resume/${id}`);
       fetchResumes();
     } catch (error) {
       alert("Delete failed");
@@ -41,7 +40,7 @@ function MyResumes() {
     if (!fileUrl) return;
 
     const cleanPath = fileUrl.replace(/\\/g, "/");
-    const fullUrl = `http://localhost:5000/${cleanPath}`;
+    const fullUrl = `${API}/${cleanPath}`;
 
     window.open(fullUrl, "_blank");
   };

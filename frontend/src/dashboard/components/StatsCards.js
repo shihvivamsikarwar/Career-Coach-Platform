@@ -1,6 +1,5 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
-git;
 function StatsCards({ stats }) {
   const navigate = useNavigate();
 

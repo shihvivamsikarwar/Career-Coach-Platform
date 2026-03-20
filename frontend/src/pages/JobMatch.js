@@ -14,6 +14,8 @@ import {
   ResponsiveContainer,
 } from "recharts";
 
+import API from "../utils/api";
+
 function JobMatch() {
   const [jobDesc, setJobDesc] = useState("");
   const [result, setResult] = useState(null);
@@ -34,7 +36,7 @@ function JobMatch() {
     try {
       setLoading(true);
 
-      const res = await axios.post("http://localhost:5000/api/job/match", {
+      const res = await axios.post(`${API}/api/job/match`, {
         userId,
         jobDescription: jobDesc,
       });

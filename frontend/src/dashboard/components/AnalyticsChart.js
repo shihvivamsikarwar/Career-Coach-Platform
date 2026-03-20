@@ -9,6 +9,7 @@ import {
   Tooltip,
   ResponsiveContainer,
 } from "recharts";
+import API from "../../utils/api";
 
 function AnalyticsChart() {
   const [data, setData] = useState([]);
@@ -20,9 +21,7 @@ function AnalyticsChart() {
 
   const fetchHistory = async () => {
     try {
-      const res = await axios.get(
-        `http://localhost:5000/api/interview/history/${userId}`
-      );
+      const res = await axios.get(`${API}/api/interview/history/${userId}`);
 
       const history = res.data.history || [];
 

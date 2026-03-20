@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import DashboardLayout from "../layout/DashboardLayout";
+import API from "../utils/api";
 
 function JobMatchAnalytics() {
   const [data, setData] = useState(null);
@@ -13,9 +14,7 @@ function JobMatchAnalytics() {
 
   const fetchAnalytics = async () => {
     try {
-      const res = await axios.get(
-        `http://localhost:5000/api/job/analytics/${userId}`
-      );
+      const res = await axios.get(`${API}/api/job/analytics/${userId}`);
 
       setData(res.data);
     } catch (err) {

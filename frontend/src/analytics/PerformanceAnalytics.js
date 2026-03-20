@@ -11,6 +11,7 @@ import {
   Legend,
 } from "chart.js";
 import { Line } from "react-chartjs-2";
+import API from "../utils/api";
 
 ChartJS.register(
   CategoryScale,
@@ -34,7 +35,7 @@ function PerformanceAnalytics() {
 
     // Fetch interview history
     axios
-      .get(`http://localhost:5000/api/interview/history/${userId}`)
+      .get(`${API}/api/interview/history/${userId}`)
       .then((res) => {
         setHistory(res.data.history.reverse());
       })
@@ -42,14 +43,14 @@ function PerformanceAnalytics() {
 
     // Fetch weak areas
     axios
-      .get(`http://localhost:5000/api/interview/weak-areas/${userId}`)
+      .get(`${API}/api/interview/weak-areas/${userId}`)
       .then((res) => {
         setWeakAreas(res.data.weakAreas);
       })
       .catch((err) => console.error(err));
 
     axios
-      .get(`http://localhost:5000/api/interview/recommendations/${userId}`)
+      .get(`${API}/api/interview/recommendations/${userId}`)
       .then((res) => {
         setRecommendations(res.data.recommendations);
       })

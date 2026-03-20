@@ -8,6 +8,7 @@ import {
   PolarRadiusAxis,
   ResponsiveContainer,
 } from "recharts";
+import API from "../../utils/api";
 
 function SkillRadarChart() {
   const [data, setData] = useState([]);
@@ -19,9 +20,7 @@ function SkillRadarChart() {
 
   const fetchSkillData = async () => {
     try {
-      const res = await axios.get(
-        `http://localhost:5000/api/dashboard/${userId}`
-      );
+      const res = await axios.get(`${API}/api/dashboard/${userId}`);
 
       const skills = res.data.skillBreakdown || {};
 

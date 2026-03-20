@@ -12,6 +12,7 @@ import {
   PolarRadiusAxis,
   ResponsiveContainer,
 } from "recharts";
+import API from "../utils/api";
 
 function ResumeAnalysis() {
   const { id } = useParams();
@@ -19,7 +20,7 @@ function ResumeAnalysis() {
 
   useEffect(() => {
     axios
-      .get(`http://localhost:5000/api/resume/${id}`)
+      .get(`${API}/api/resume/${id}`)
       .then((res) => setResume(res.data))
       .catch((err) => console.error(err));
   }, [id]);

@@ -9,6 +9,7 @@ import {
   ResponsiveContainer,
   CartesianGrid,
 } from "recharts";
+import API from "../../utils/api";
 
 function WeakAreasChart() {
   const [data, setData] = useState([]);
@@ -20,9 +21,7 @@ function WeakAreasChart() {
 
   const fetchWeakAreas = async () => {
     try {
-      const res = await axios.get(
-        `http://localhost:5000/api/interview/weak-areas/${userId}`
-      );
+      const res = await axios.get(`${API}/api/interview/weak-areas/${userId}`);
 
       setData(res.data.weakAreas || []);
     } catch (err) {

@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import DashboardLayout from "../layout/DashboardLayout";
 import { useParams } from "react-router-dom";
+import API from "../utils/api";
 
 function JobMatchReport() {
   const { id } = useParams();
@@ -13,7 +14,7 @@ function JobMatchReport() {
 
   const fetchReport = async () => {
     try {
-      const res = await axios.get(`http://localhost:5000/api/job/report/${id}`);
+      const res = await axios.get(`${API}/api/job/report/${id}`);
 
       setData(res.data);
     } catch (error) {

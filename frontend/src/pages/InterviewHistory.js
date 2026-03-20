@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import "../styles/interviewHistory.css";
+import API from "../utils/api";
 
 function InterviewHistory() {
   const [history, setHistory] = useState([]);
@@ -14,9 +15,7 @@ function InterviewHistory() {
 
     async function loadHistory() {
       try {
-        const res = await axios.get(
-          `http://localhost:5000/api/interview/history/${userId}`
-        );
+        const res = await axios.get(`${API}/api/interview/history/${userId}`);
 
         setHistory(res.data.history || []);
       } catch {

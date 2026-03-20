@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import DashboardLayout from "../layout/DashboardLayout";
 import { useNavigate } from "react-router-dom";
+import API from "../utils/api";
 
 function JobMatchHistory() {
   const [history, setHistory] = useState([]);
@@ -16,9 +17,7 @@ function JobMatchHistory() {
 
   const fetchHistory = async () => {
     try {
-      const res = await axios.get(
-        `http://localhost:5000/api/job/history/${userId}`
-      );
+      const res = await axios.get(`${API}/api/job/history/${userId}`);
 
       console.log("History Data:", res.data);
 

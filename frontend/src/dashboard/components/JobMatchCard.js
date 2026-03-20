@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-
+import API from "../../utils/api";
 function JobMatchCard() {
   const [data, setData] = useState(null);
 
@@ -10,7 +10,7 @@ function JobMatchCard() {
     if (!userId) return;
 
     axios
-      .get(`http://localhost:5000/api/jobmatch/analytics/${userId}`)
+      .get(`${API}/api/jobmatch/analytics/${userId}`)
       .then((res) => {
         setData(res.data);
       })

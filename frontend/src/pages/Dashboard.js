@@ -10,6 +10,7 @@ import WeakAreasChart from "../dashboard/components/WeakAreasChart";
 import SkillRadarChart from "../dashboard/components/SkillRadarChart";
 import RecentInterviews from "../dashboard/components/RecentInterviews";
 import AIInsights from "../dashboard/components/AlInsights";
+import API from "../utils/api";
 
 function Dashboard() {
   const [stats, setStats] = useState(null);
@@ -24,14 +25,12 @@ function Dashboard() {
 
   const fetchDashboardData = async () => {
     try {
-      const res = await axios.get(
-        `http://localhost:5000/api/dashboard/${userId}`
-      );
+      const res = await axios.get(`${API}/api/dashboard/${userId}`);
       setStats(res.data.stats);
       setUserName(res.data.user?.name || "User");
 
       const aiRes = await axios.get(
-        `http://localhost:5000/api/dashboard/ai-recommendations/${userId}`
+        `${API}/api/dashboard/ai-recommendations/${userId}`
       );
 
       setAiData(aiRes.data);

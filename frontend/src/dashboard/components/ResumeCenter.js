@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import API from "../../utils/api";
 
 function ResumeCenter() {
   const [resume, setResume] = useState(null);
@@ -14,9 +15,7 @@ function ResumeCenter() {
 
   const fetchResume = async () => {
     try {
-      const res = await axios.get(
-        `http://localhost:5000/api/resume/latest/${userId}`
-      );
+      const res = await axios.get(`${API}/api/resume/latest/${userId}`);
 
       console.log("Resume API:", res.data); // debug
 

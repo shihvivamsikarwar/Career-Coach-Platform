@@ -12,6 +12,7 @@ import {
   Legend,
   ResponsiveContainer,
 } from "recharts";
+import API from "../utils/api";
 
 function JobMatchResult() {
   const { id } = useParams();
@@ -23,7 +24,7 @@ function JobMatchResult() {
 
   const fetchData = async () => {
     try {
-      const res = await axios.get(`http://localhost:5000/api/job/${id}`);
+      const res = await axios.get(`${API}/api/job/${id}`);
 
       setData(res.data);
     } catch (err) {

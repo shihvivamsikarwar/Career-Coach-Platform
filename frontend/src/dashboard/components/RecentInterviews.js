@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
+import API from "../../utils/api";
 
 function RecentInterviews() {
   const [history, setHistory] = useState([]);
@@ -11,9 +12,7 @@ function RecentInterviews() {
 
   const fetchHistory = async () => {
     try {
-      const res = await axios.get(
-        `http://localhost:5000/api/interview/history/${userId}`
-      );
+      const res = await axios.get(`${API}/api/interview/history/${userId}`);
 
       setHistory(res.data.history || []);
     } catch (err) {

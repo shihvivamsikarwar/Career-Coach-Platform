@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import axios from "axios";
 import { Link, useNavigate } from "react-router-dom";
 import Footer from "../landingPage/Footer";
+import API from "../utils/api";
 
 function Register() {
   const [name, setName] = useState("");
@@ -14,15 +15,24 @@ function Register() {
     e.preventDefault();
 
     try {
-      await axios.post("http://localhost:5000/api/auth/register", {
+      console.log("Attempting registration to:", `${API}/api/auth/register`);
+      console.log("Registration data:", { name, email, password: "***" });
+      
+      const res = await axios.post(`${API}/api/auth/register`, {
         name,
         email,
         password,
       });
 
+      console.log("Registration response:", res.data);
       navigate("/login");
     } catch (err) {
-      alert(err.response?.data?.message || "Registration failed");
+      console.error("Registration error:", err);
+      console.error("Error response:", err.response?.data);
+      console.error("Error status:", err.response?.status);
+      
+      const errorMessage = err.response?.data?.message || "Registration failed";
+      alert(errorMessage);
     }
   };
 

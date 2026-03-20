@@ -5,6 +5,7 @@ import Footer from "../landingPage/Footer";
 
 import { FcGoogle } from "react-icons/fc";
 import { FaGithub, FaLinkedin } from "react-icons/fa";
+import API from "../utils/api";
 
 function Login({ setIsLoggedIn }) {
   const [email, setEmail] = useState("");
@@ -15,12 +16,19 @@ function Login({ setIsLoggedIn }) {
 
   const handleLogin = async (e) => {
     e.preventDefault();
+    console.log("handleLogin function called!");
+    console.log("Form data:", { email, password: "***" });
 
     try {
-      const res = await axios.post("http://localhost:5000/api/auth/login", {
+      console.log("Attempting login to:", `${API}/api/auth/login`);
+      console.log("Login data:", { email, password: "***" });
+      
+      const res = await axios.post(`${API}/api/auth/login`, {
         email,
         password,
       });
+
+      console.log("Login response:", res.data);
 
       localStorage.setItem("userId", res.data.user._id);
       localStorage.setItem("userName", res.data.user.name);
@@ -29,7 +37,12 @@ function Login({ setIsLoggedIn }) {
       setIsLoggedIn(true);
       navigate("/dashboard");
     } catch (err) {
-      alert(err.response?.data?.message || "Login failed");
+      console.error("Login error:", err);
+      console.error("Error response:", err.response?.data);
+      console.error("Error status:", err.response?.status);
+      
+      const errorMessage = err.response?.data?.message || "Login failed";
+      alert(errorMessage);
     }
   };
 
@@ -123,6 +136,7 @@ function Login({ setIsLoggedIn }) {
               </div>
 
               <button
+                type="submit"
                 className="btn w-100 py-2"
                 style={{
                   borderRadius: "30px",
