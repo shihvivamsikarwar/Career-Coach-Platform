@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import axios from "axios";
 import {
   LineChart,
@@ -15,11 +15,7 @@ function AnalyticsChart() {
   const [data, setData] = useState([]);
   const userId = localStorage.getItem("userId");
 
-  useEffect(() => {
-    fetchHistory();
-  }, []);
-
-  const fetchHistory = async () => {
+  const fetchHistory = useCallback(async () => {
     try {
       const res = await axios.get(`${API}/api/interview/history/${userId}`);
 
@@ -28,13 +24,18 @@ function AnalyticsChart() {
       const formatted = history.map((item, index) => ({
         attempt: index + 1,
         score: item.score,
+        date: new Date(item.createdAt).toLocaleDateString(),
       }));
 
       setData(formatted);
-    } catch (err) {
-      console.error("Analytics error", err);
+    } catch (error) {
+      console.error("Analytics fetch error:", error);
     }
-  };
+  }, [userId]);
+
+  useEffect(() => {
+    fetchHistory();
+  }, [fetchHistory]);
 
   return (
     <div className="card shadow-sm border-0 p-4 h-100">
