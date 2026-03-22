@@ -13,8 +13,8 @@ const validateApiUrl = (url) => {
 // API URL Configuration with fallbacks
 const API_URLS = [
   process.env.REACT_APP_API_URL,
-  'http://localhost:5000',
-  'https://career-coach-platform.onrender.com'
+  'https://career-coach-platform.onrender.com',
+  'http://localhost:5000'
 ];
 
 const getValidApiUrl = () => {
@@ -23,7 +23,8 @@ const getValidApiUrl = () => {
       return url;
     }
   }
-  throw new Error('No valid API URL found');
+  // Return fallback instead of throwing error
+  return 'https://career-coach-platform.onrender.com';
 };
 
 const API_BASE_URL = getValidApiUrl();
