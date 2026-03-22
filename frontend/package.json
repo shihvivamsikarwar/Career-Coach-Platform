@@ -1,6 +1,7 @@
 {
-  "name": "frontend",
-  "version": "0.1.0",
+  "name": "career-coach-platform",
+  "version": "1.0.0",
+  "description": "AI-powered career coaching platform with interview practice and job market insights",
   "private": true,
   "dependencies": {
     "@testing-library/dom": "^10.4.1",

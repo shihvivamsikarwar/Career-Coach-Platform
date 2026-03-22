@@ -12,11 +12,11 @@ function Hero() {
         style={{ zIndex: 2 }}
       >
         {/* Badge */}
-        <div className="badge-pill mb-4">🚀 AI Powered Interview Platform</div>
+        <div className="badge-pill mb-4">🎯 AI-Powered Career Coaching Platform</div>
 
         {/* Heading */}
         <h1 className="hero-title fw-bold mb-4">
-          Crack Interviews Faster with{" "}
+          Advance Your Career with{" "}
           <span className="gradient-text">AI Career Coach</span>
         </h1>
 

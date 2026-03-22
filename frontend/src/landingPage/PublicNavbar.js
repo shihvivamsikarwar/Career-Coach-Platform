@@ -21,7 +21,7 @@ function PublicNavbar() {
             to="/"
             className="d-flex align-items-center gap-2 text-decoration-none"
           >
-            <span style={{ fontSize: "26px" }}>🧠</span>
+            <span style={{ fontSize: "26px" }}>🎯</span>
             <span
               className="fw-bold"
               style={{
@@ -31,7 +31,7 @@ function PublicNavbar() {
                 WebkitTextFillColor: "transparent",
               }}
             >
-              AI Career Coach
+              Career Coach Platform
             </span>
           </Link>
 

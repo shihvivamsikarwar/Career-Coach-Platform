@@ -25,7 +25,7 @@ function Sidebar() {
         padding: "20px",
       }}
     >
-      <h4 className="mb-4">🧠 CareerAI</h4>
+      <h4 className="mb-4">🎯 Career Coach</h4>
 
       <NavLink to="/dashboard" style={linkStyle}>
         📊 Dashboard
