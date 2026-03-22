@@ -1,6 +1,6 @@
 {
   "name": "career-coach-platform",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "AI-powered career coaching platform with interview practice and job market insights",
   "private": true,
   "dependencies": {
