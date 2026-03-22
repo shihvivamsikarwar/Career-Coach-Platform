@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import axios from "axios";
 import DashboardLayout from "../layout/DashboardLayout";
 import { useParams } from "react-router-dom";
@@ -8,19 +8,18 @@ function JobMatchReport() {
   const { id } = useParams();
   const [data, setData] = useState(null);
 
-  useEffect(() => {
-    fetchReport();
-  }, []);
-
-  const fetchReport = async () => {
+  const fetchReport = useCallback(async () => {
     try {
       const res = await axios.get(`${API}/api/job/report/${id}`);
-
       setData(res.data);
     } catch (error) {
       console.error(error);
     }
-  };
+  }, [id]);
+
+  useEffect(() => {
+    fetchReport();
+  }, [fetchReport]);
 
   if (!data) return <p>Loading...</p>;
 

@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useState, useRef, useCallback } from "react";
 import axios from "axios";
 import { useNavigate, useLocation } from "react-router-dom";
 import "../styles/mockInterview.css";
@@ -27,170 +27,31 @@ function MockInterview() {
 
   const MAX_QUESTIONS = 10;
 
-  // ================= START INTERVIEW =================
+  // ================= SUBMIT =================
 
-  useEffect(() => {
-    if (!domain) {
-      navigate("/interview");
-      return;
-    }
-
-    async function startInterview() {
-      try {
-        const res = await axios.post(`${API}/api/interview/start`, {
-          userId: localStorage.getItem("userId"),
-          domain,
-        });
-
-        const firstQuestion =
-          res.data.questionText || res.data.questions?.[0]?.questionText;
-
-        setQuestions([firstQuestion]);
-        setAnswers([""]);
-      } catch {
-        alert("Failed to start interview");
-      } finally {
-        setLoading(false);
-      }
-    }
-
-    startInterview();
-  }, []);
-
-  // ================= TIMER =================
-
-  useEffect(() => {
-    if (!questions.length) return;
-
+  const handleSubmit = useCallback(async (auto = false) => {
     clearInterval(timerRef.current);
 
-    timerRef.current = setInterval(() => {
-      setTimeLeft((prev) => {
-        if (prev <= 1) {
-          clearInterval(timerRef.current);
-
-          handleNext(true);
-
-          return 90;
-        }
-
-        return prev - 1;
+    try {
+      const res = await axios.post(`${API}/api/interview/submit`, {
+        userId: localStorage.getItem("userId"),
+        domain,
+        difficulty: "easy",
+        questions,
+        answers,
+        warnings,
+        autoSubmitted: auto,
       });
-    }, 1000);
 
-    return () => clearInterval(timerRef.current);
-  }, [current, questions]);
-
-  // ================= WARNING SYSTEM =================
-
-  const triggerWarning = (message) => {
-    if (warningLock) return;
-
-    setWarningLock(true);
-
-    setWarnings((prev) => {
-      const newCount = Math.min(prev + 1, 3);
-      setWarningMessage(`${message} | Warning ${newCount}/3`);
-
-      setTimeout(() => {
-        setWarningMessage("");
-        setWarningLock(false);
-      }, 3000);
-
-      if (newCount >= 3) {
-        handleSubmit(true);
-      }
-
-      return newCount;
-    });
-  };
-
-  // ================= TAB SWITCH =================
-
-  useEffect(() => {
-    const handleVisibility = () => {
-      if (document.hidden) {
-        triggerWarning("Tab switching detected");
-      }
-    };
-
-    document.addEventListener("visibilitychange", handleVisibility);
-
-    return () =>
-      document.removeEventListener("visibilitychange", handleVisibility);
-  }, []);
-
-  // ================= WINDOW BLUR =================
-
-  useEffect(() => {
-    const handleBlur = () => {
-      if (!document.hidden) {
-        triggerWarning("Window focus lost");
-      }
-    };
-
-    window.addEventListener("blur", handleBlur);
-
-    return () => window.removeEventListener("blur", handleBlur);
-  }, []);
-
-  // ================= BLOCK DEVTOOLS =================
-
-  useEffect(() => {
-    const handleKey = (e) => {
-      if (
-        e.key === "F12" ||
-        (e.ctrlKey && e.shiftKey && e.key === "I") ||
-        (e.ctrlKey && e.shiftKey && e.key === "J") ||
-        (e.ctrlKey && e.key === "u")
-      ) {
-        e.preventDefault();
-        triggerWarning("Developer tools blocked");
-      }
-    };
-
-    document.addEventListener("keydown", handleKey);
-
-    return () => document.removeEventListener("keydown", handleKey);
-  }, []);
-
-  // ================= BLOCK COPY / PASTE =================
-
-  useEffect(() => {
-    const blockCopy = (e) => {
-      e.preventDefault();
-      triggerWarning("Copy not allowed");
-    };
-
-    const blockPaste = (e) => {
-      e.preventDefault();
-      triggerWarning("Paste not allowed");
-    };
-
-    const blockRightClick = (e) => e.preventDefault();
-
-    document.addEventListener("copy", blockCopy);
-    document.addEventListener("paste", blockPaste);
-    document.addEventListener("contextmenu", blockRightClick);
-
-    return () => {
-      document.removeEventListener("copy", blockCopy);
-      document.removeEventListener("paste", blockPaste);
-      document.removeEventListener("contextmenu", blockRightClick);
-    };
-  }, []);
+      navigate("/interview-result", { state: res.data });
+    } catch {
+      alert("Submission failed");
+    }
+  }, [domain, questions, answers, warnings, navigate]);
 
   // ================= ANSWER =================
 
-  const handleChange = (value) => {
-    const updated = [...answers];
-    updated[current] = value;
-    setAnswers(updated);
-  };
-
-  // ================= NEXT QUESTION =================
-
-  const handleNext = async (auto = false) => {
+  const handleNext = useCallback(async (auto = false) => {
     if (loadingNext) return;
 
     if (questions.length >= MAX_QUESTIONS) {
@@ -220,28 +81,167 @@ function MockInterview() {
     }
 
     setLoadingNext(false);
-  };
+  }, [loadingNext, MAX_QUESTIONS, handleSubmit, domain, questions, current, answers]);
 
-  // ================= SUBMIT =================
+  // ================= START INTERVIEW =================
 
-  const handleSubmit = async (auto = false) => {
+  useEffect(() => {
+    if (!domain) {
+      navigate("/interview");
+      return;
+    }
+
+    async function startInterview() {
+      try {
+        const res = await axios.post(`${API}/api/interview/start`, {
+          userId: localStorage.getItem("userId"),
+          domain,
+        });
+
+        const firstQuestion =
+          res.data.questionText || res.data.questions?.[0]?.questionText;
+
+        setQuestions([firstQuestion]);
+        setAnswers([""]);
+      } catch {
+        alert("Failed to start interview");
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    startInterview();
+  }, [domain, navigate]);
+
+  // ================= TIMER =================
+
+  useEffect(() => {
+    if (!questions.length) return;
+
     clearInterval(timerRef.current);
 
-    try {
-      const res = await axios.post(`${API}/api/interview/submit`, {
-        userId: localStorage.getItem("userId"),
-        domain,
-        difficulty: "easy",
-        questions,
-        answers,
-        warnings,
-        autoSubmitted: auto,
-      });
+    timerRef.current = setInterval(() => {
+      setTimeLeft((prev) => {
+        if (prev <= 1) {
+          clearInterval(timerRef.current);
 
-      navigate("/interview-result", { state: res.data });
-    } catch {
-      alert("Submission failed");
-    }
+          handleNext(true);
+
+          return 90;
+        }
+
+        return prev - 1;
+      });
+    }, 1000);
+
+    return () => clearInterval(timerRef.current);
+  }, [current, questions, handleNext]);
+
+  // ================= WARNING SYSTEM =================
+
+  const triggerWarning = useCallback((message) => {
+    if (warningLock) return;
+
+    setWarningLock(true);
+
+    setWarnings((prev) => {
+      const newCount = Math.min(prev + 1, 3);
+      setWarningMessage(`${message} | Warning ${newCount}/3`);
+
+      setTimeout(() => {
+        setWarningMessage("");
+        setWarningLock(false);
+      }, 3000);
+
+      if (newCount >= 3) {
+        handleSubmit(true);
+      }
+
+      return newCount;
+    });
+  }, [warningLock, handleSubmit]);
+
+  // ================= TAB SWITCH =================
+
+  useEffect(() => {
+    const handleVisibility = () => {
+      if (document.hidden) {
+        triggerWarning("Tab switching detected");
+      }
+    };
+
+    document.addEventListener("visibilitychange", handleVisibility);
+
+    return () =>
+      document.removeEventListener("visibilitychange", handleVisibility);
+  }, [triggerWarning]);
+
+  // ================= WINDOW BLUR =================
+
+  useEffect(() => {
+    const handleBlur = () => {
+      if (!document.hidden) {
+        triggerWarning("Window focus lost");
+      }
+    };
+
+    window.addEventListener("blur", handleBlur);
+
+    return () => window.removeEventListener("blur", handleBlur);
+  }, [triggerWarning]);
+
+  // ================= BLOCK DEVTOOLS =================
+
+  useEffect(() => {
+    const handleKey = (e) => {
+      if (
+        e.key === "F12" ||
+        (e.ctrlKey && e.shiftKey && e.key === "I") ||
+        (e.ctrlKey && e.shiftKey && e.key === "J") ||
+        (e.ctrlKey && e.key === "u")
+      ) {
+        e.preventDefault();
+        triggerWarning("Developer tools blocked");
+      }
+    };
+
+    document.addEventListener("keydown", handleKey);
+
+    return () => document.removeEventListener("keydown", handleKey);
+  }, [triggerWarning]);
+
+  // ================= BLOCK COPY / PASTE =================
+
+  useEffect(() => {
+    const blockCopy = (e) => {
+      e.preventDefault();
+      triggerWarning("Copy not allowed");
+    };
+
+    const blockPaste = (e) => {
+      e.preventDefault();
+      triggerWarning("Paste not allowed");
+    };
+
+    const blockRightClick = (e) => e.preventDefault();
+
+    document.addEventListener("copy", blockCopy);
+    document.addEventListener("paste", blockPaste);
+    document.addEventListener("contextmenu", blockRightClick);
+
+    return () => {
+      document.removeEventListener("copy", blockCopy);
+      document.removeEventListener("paste", blockPaste);
+      document.removeEventListener("contextmenu", blockRightClick);
+    };
+  }, [triggerWarning]);
+
+  // ================= ANSWER =================
+
+  const handleChange = (value) => {
+    const updated = [...answers];
+    updated[current] = value;
+    setAnswers(updated);
   };
 
   if (loading) {

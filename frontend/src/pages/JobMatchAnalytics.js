@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import axios from "axios";
 import DashboardLayout from "../layout/DashboardLayout";
 import API from "../utils/api";
@@ -8,19 +8,18 @@ function JobMatchAnalytics() {
 
   const userId = localStorage.getItem("userId");
 
-  useEffect(() => {
-    fetchAnalytics();
-  }, []);
-
-  const fetchAnalytics = async () => {
+  const fetchAnalytics = useCallback(async () => {
     try {
       const res = await axios.get(`${API}/api/job/analytics/${userId}`);
-
       setData(res.data);
     } catch (err) {
       console.error(err);
     }
-  };
+  }, [userId]);
+
+  useEffect(() => {
+    fetchAnalytics();
+  }, [fetchAnalytics]);
 
   if (!data)
     return (

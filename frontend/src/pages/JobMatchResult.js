@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import axios from "axios";
 import { useParams } from "react-router-dom";
 import DashboardLayout from "../layout/DashboardLayout";
@@ -18,19 +18,18 @@ function JobMatchResult() {
   const { id } = useParams();
   const [data, setData] = useState(null);
 
-  useEffect(() => {
-    fetchData();
-  }, []);
-
-  const fetchData = async () => {
+  const fetchReport = useCallback(async () => {
     try {
-      const res = await axios.get(`${API}/api/job/${id}`);
-
+      const res = await axios.get(`${API}/api/job/report/${id}`);
       setData(res.data);
-    } catch (err) {
-      console.error(err);
+    } catch (error) {
+      console.error(error);
     }
-  };
+  }, [id]);
+
+  useEffect(() => {
+    fetchReport();
+  }, [fetchReport]);
 
   const getColor = (score) => {
     if (score >= 75) return "success";

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import axios from "axios";
 import DashboardLayout from "../layout/DashboardLayout";
 import { useNavigate } from "react-router-dom";
@@ -11,23 +11,21 @@ function JobMatchHistory() {
   const navigate = useNavigate();
   const userId = localStorage.getItem("userId");
 
-  useEffect(() => {
-    fetchHistory();
-  }, []);
-
-  const fetchHistory = async () => {
+  const fetchHistory = useCallback(async () => {
     try {
       const res = await axios.get(`${API}/api/job/history/${userId}`);
-
       console.log("History Data:", res.data);
-
       setHistory(res.data || []);
     } catch (err) {
       console.error("History error:", err);
     } finally {
       setLoading(false);
     }
-  };
+  }, [userId]);
+
+  useEffect(() => {
+    fetchHistory();
+  }, [fetchHistory]);
 
   return (
     <DashboardLayout>
