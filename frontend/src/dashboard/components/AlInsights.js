@@ -1,6 +1,6 @@
 import React from "react";
 
-function AIInsights({ data }) {
+function AlInsights({ data }) {
   if (!data) {
     return (
       <div className="card shadow-sm border-0 p-4 mb-4">
@@ -46,4 +46,4 @@ function AIInsights({ data }) {
   );
 }
 
-export default AIInsights;
+export default AlInsights;

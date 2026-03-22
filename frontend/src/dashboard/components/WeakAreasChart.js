@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import axios from "axios";
 import {
   BarChart,
@@ -15,11 +15,7 @@ function WeakAreasChart() {
   const [data, setData] = useState([]);
   const userId = localStorage.getItem("userId");
 
-  useEffect(() => {
-    fetchWeakAreas();
-  }, []);
-
-  const fetchWeakAreas = async () => {
+  const fetchWeakAreas = useCallback(async () => {
     try {
       const res = await axios.get(`${API}/api/interview/weak-areas/${userId}`);
 
@@ -27,7 +23,11 @@ function WeakAreasChart() {
     } catch (err) {
       console.error("Weak area fetch error", err);
     }
-  };
+  }, [userId]);
+
+  useEffect(() => {
+    fetchWeakAreas();
+  }, [fetchWeakAreas]);
 
   return (
     <div className="card shadow-sm border-0 p-4 h-100">

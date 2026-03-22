@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import API from "../../utils/api";
@@ -9,11 +9,7 @@ function ResumeCenter() {
 
   const userId = localStorage.getItem("userId");
 
-  useEffect(() => {
-    if (userId) fetchResume();
-  }, [userId]);
-
-  const fetchResume = async () => {
+  const fetchResume = useCallback(async () => {
     try {
       const res = await axios.get(`${API}/api/resume/latest/${userId}`);
 
@@ -23,7 +19,11 @@ function ResumeCenter() {
     } catch (err) {
       console.error("Resume fetch error:", err);
     }
-  };
+  }, [userId]);
+
+  useEffect(() => {
+    if (userId) fetchResume();
+  }, [userId, fetchResume]);
 
   return (
     <div className="card shadow-sm border-0 rounded-4 p-4">

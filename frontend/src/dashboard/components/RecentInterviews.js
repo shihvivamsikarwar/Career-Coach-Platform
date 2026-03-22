@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import axios from "axios";
 import API from "../../utils/api";
 
@@ -6,11 +6,7 @@ function RecentInterviews() {
   const [history, setHistory] = useState([]);
   const userId = localStorage.getItem("userId");
 
-  useEffect(() => {
-    fetchHistory();
-  }, []);
-
-  const fetchHistory = async () => {
+  const fetchHistory = useCallback(async () => {
     try {
       const res = await axios.get(`${API}/api/interview/history/${userId}`);
 
@@ -18,7 +14,11 @@ function RecentInterviews() {
     } catch (err) {
       console.error("History error", err);
     }
-  };
+  }, [userId]);
+
+  useEffect(() => {
+    fetchHistory();
+  }, [fetchHistory]);
 
   return (
     <div className="card shadow-sm border-0 p-4 mt-4">

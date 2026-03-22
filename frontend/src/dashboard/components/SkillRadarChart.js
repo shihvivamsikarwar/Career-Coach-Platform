@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import axios from "axios";
 import {
   Radar,
@@ -14,11 +14,7 @@ function SkillRadarChart() {
   const [data, setData] = useState([]);
   const userId = localStorage.getItem("userId");
 
-  useEffect(() => {
-    fetchSkillData();
-  }, []);
-
-  const fetchSkillData = async () => {
+  const fetchSkillData = useCallback(async () => {
     try {
       const res = await axios.get(`${API}/api/dashboard/${userId}`);
 
@@ -36,7 +32,11 @@ function SkillRadarChart() {
     } catch (err) {
       console.error("Skill data error", err);
     }
-  };
+  }, [userId]);
+
+  useEffect(() => {
+    fetchSkillData();
+  }, [fetchSkillData]);
 
   return (
     <div className="card shadow-sm border-0 p-4 h-100">

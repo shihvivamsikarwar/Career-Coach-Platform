@@ -7,7 +7,7 @@ function InterviewReport() {
 
   const data = location.state || {};
 
-  const { domain, difficulty, score, grade, feedback = {}, createdAt } = data;
+  const { domain, score, grade, feedback = {}, createdAt } = data;
 
   return (
     <div className="container py-5">

@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback } from "react";
+import React, { useEffect, useState } from "react";
 
 import DashboardLayout from "../layout/DashboardLayout";
 import StatsCards from "../dashboard/components/StatsCards";
@@ -8,8 +8,8 @@ import AnalyticsChart from "../dashboard/components/AnalyticsChart";
 import WeakAreasChart from "../dashboard/components/WeakAreasChart";
 import SkillRadarChart from "../dashboard/components/SkillRadarChart";
 import RecentInterviews from "../dashboard/components/RecentInterviews";
-import AIInsights from "../dashboard/components/AIInsights";
-import { api, retryRequest } from "../utils/api";
+import AlInsights from "../dashboard/components/AlInsights";
+import { api } from "../utils/api";
 
 function Dashboard() {
   const [stats, setStats] = useState(null);
@@ -22,107 +22,132 @@ function Dashboard() {
   const userId = localStorage.getItem("userId");
 
   useEffect(() => {
-    if (userId) {
-      fetchDashboardData();
-    } else {
-      setError("User ID not found. Please login again.");
-      setIsLoading(false);
-    }
-  }, [userId, fetchDashboardData]);
-
-  const fetchDashboardData = useCallback(async () => {
-    setIsLoading(true);
-    setError(null);
-
-    try {
-      // Fetch dashboard stats with retry logic
-      const statsResponse = await retryRequest(
-        () => api.get(`/api/dashboard/${userId}`),
-        3,
-        1000
-      );
-      
-      setStats(statsResponse.data.stats);
-      setUserName(statsResponse.data.user?.name || "User");
-
-      // Fetch AI recommendations with retry logic
-      const aiResponse = await retryRequest(
-        () => api.get(`/api/dashboard/ai-recommendations/${userId}`),
-        2,
-        1000
-      );
-
-      setAiData(aiResponse.data);
-      console.log("Dashboard Data:", statsResponse.data);
-      
-    } catch (err) {
-      console.error("Dashboard fetch error:", err);
-      
-      // Handle different error types
-      if (err.response) {
-        const { status, data } = err.response;
-        
-        if (status === 401) {
-          setError("Session expired. Please login again.");
-          // Clear auth data and redirect to login
-          localStorage.removeItem("isLoggedIn");
-          localStorage.removeItem("token");
-          localStorage.removeItem("userId");
-          localStorage.removeItem("userName");
-          window.location.href = "/login";
-        } else if (status === 404) {
-          setError("Dashboard data not found. Please complete your profile.");
-        } else if (status === 500) {
-          setError("Server error. Please try again later.");
-        } else {
-          setError(data.error || "Failed to load dashboard data.");
-        }
-      } else if (err.request) {
-        setError("Network error. Please check your connection.");
-      } else {
-        setError("Failed to load dashboard. Please try again.");
+    const loadDashboard = async () => {
+      if (!userId) {
+        setError("User ID not found. Please login again.");
+        setIsLoading(false);
+        return;
       }
-    } finally {
-      setIsLoading(false);
-    }
+
+      setIsLoading(true);
+      setError(null);
+
+      try {
+        // Fetch real dashboard stats from backend
+        const statsResponse = await api.get(`/api/dashboard/${userId}`);
+        
+        console.log("Raw Backend Response:", statsResponse.data);
+        console.log("Backend Stats Object:", statsResponse.data.stats);
+        
+        // Map the backend data to match what components expect
+        const backendStats = statsResponse.data.stats || {};
+        const mappedStats = {
+          total: backendStats.total || 0,
+          interviews: backendStats.interviews || backendStats.totalInterviews || 0,
+          resumes: backendStats.resumes || 0,
+          jobMatches: backendStats.jobMatches || 0,
+          // Additional fields for StatsCards component
+          totalInterviews: backendStats.interviews || backendStats.totalInterviews || 0,
+          averageScore: backendStats.averageScore || backendStats.avgScore || 0,
+          skillLevel: backendStats.skillLevel || "Beginner"
+        };
+        
+        setStats(mappedStats);
+        setUserName(statsResponse.data.user?.name || "User");
+
+        // Fetch real AI recommendations from backend
+        try {
+          const aiResponse = await api.get(`/api/dashboard/ai-recommendations/${userId}`);
+          setAiData(aiResponse.data);
+          console.log("AI Response:", aiResponse.data);
+        } catch (aiErr) {
+          console.log("AI recommendations not available:", aiErr);
+          setAiData(null);
+        }
+        
+        console.log("Mapped Stats:", mappedStats);
+        
+      } catch (err) {
+        console.error("Dashboard fetch error:", err);
+        
+        // Handle different error types
+        if (err.response) {
+          const { status, data } = err.response;
+          
+          if (status === 401) {
+            setError("Session expired. Please login again.");
+            // Clear auth data and redirect to login
+            localStorage.removeItem("isLoggedIn");
+            localStorage.removeItem("token");
+            localStorage.removeItem("userId");
+            localStorage.removeItem("userName");
+            window.location.href = "/login";
+          } else if (status === 404) {
+            // User has no data yet, show empty state
+            const emptyStats = {
+              total: 0, interviews: 0, resumes: 0, jobMatches: 0,
+              totalInterviews: 0, averageScore: 0, skillLevel: "Beginner"
+            };
+            setStats(emptyStats);
+            setUserName(localStorage.getItem("userName") || "User");
+            setAiData(null);
+          } else if (status === 500) {
+            setError("Server error. Please try again later.");
+          } else {
+            setError(data.error || "Failed to load dashboard data.");
+          }
+        } else if (err.request) {
+          setError("Network error. Please check your connection.");
+        } else {
+          setError("Failed to load dashboard. Please try again.");
+        }
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    loadDashboard();
   }, [userId]);
 
   const handleRetry = () => {
     setRetryCount(prev => prev + 1);
-    fetchDashboardData();
-  };
-
-  const handleLogout = () => {
-    localStorage.clear();
-    window.location.href = "/login";
+    window.location.reload(); // Simple reload to retry
   };
 
   return (
     <DashboardLayout>
       <div className="container-fluid">
-        {/* Header */}
+        {/* Enhanced Header */}
         <div className="mb-4">
           <div className="d-flex justify-content-between align-items-center">
             <div>
-              <h3>Dashboard Overview</h3>
-              <p className="text-muted">👋 Welcome back, {userName}</p>
+              <h1 className="h2 mb-2 fw-bold text-primary">Career Dashboard</h1>
+              <div className="d-flex align-items-center gap-3">
+                <p className="text-muted mb-0">👋 Welcome back, <span className="fw-semibold">{userName}</span></p>
+                {stats?.skillLevel && (
+                  <span className="badge bg-success fs-6">{stats.skillLevel}</span>
+                )}
+              </div>
             </div>
-            <button 
-              className="btn btn-outline-danger btn-sm"
-              onClick={handleLogout}
-            >
-              Logout
-            </button>
+            <div className="d-flex gap-2">
+              <button 
+                className="btn btn-outline-primary btn-sm"
+                onClick={() => window.location.href = '/analytics'}
+              >
+                📊 Analytics
+              </button>
+            </div>
           </div>
         </div>
 
-        {/* Loading State */}
+        {/* Enhanced Loading State */}
         {isLoading && (
           <div className="text-center py-5">
-            <div className="spinner-border text-primary mb-3" role="status">
+            <div className="spinner-border text-primary mb-3" role="status" style={{width: '3rem', height: '3rem'}}>
               <span className="visually-hidden">Loading...</span>
             </div>
-            <p className="text-muted">Loading dashboard data...</p>
+            <p className="text-muted mb-0">Loading your career insights...</p>
+            <small className="text-muted">Preparing personalized dashboard</small>
           </div>
         )}
 
@@ -183,8 +208,17 @@ function Dashboard() {
               </div>
             </div>
             
-            <AIInsights data={aiData} />
-            <RecentInterviews />
+            <div className="row mt-4">
+              <div className="col-12">
+                <AlInsights data={aiData} />
+              </div>
+            </div>
+            
+            <div className="row mt-4">
+              <div className="col-12">
+                <RecentInterviews />
+              </div>
+            </div>
           </>
         )}
 

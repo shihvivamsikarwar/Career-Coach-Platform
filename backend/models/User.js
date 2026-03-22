@@ -76,19 +76,7 @@ userSchema.virtual('isLocked').get(function() {
   return !!(this.lockUntil && this.lockUntil > Date.now());
 });
 
-// Pre-save middleware for password hashing (if needed)
-userSchema.pre('save', async function(next) {
-  if (!this.isModified('password')) return next();
-  
-  try {
-    const bcrypt = require('bcryptjs');
-    const salt = await bcrypt.genSalt(12);
-    this.password = await bcrypt.hash(this.password, salt);
-    next();
-  } catch (error) {
-    next(error);
-  }
-});
+// Pre-save middleware removed - authController handles password hashing
 
 // Instance methods
 userSchema.methods.toJSON = function() {

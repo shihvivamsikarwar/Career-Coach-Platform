@@ -201,7 +201,7 @@ function MockInterview() {
     setLoadingNext(true);
 
     try {
-      const res = await axios.post("${API}/api/interview/next-question", {
+      const res = await axios.post(`${API}/api/interview/next-question`, {
         domain,
         previousQuestion: questions[current],
         previousAnswer: answers[current]?.trim() || "No answer provided",
@@ -228,7 +228,7 @@ function MockInterview() {
     clearInterval(timerRef.current);
 
     try {
-      const res = await axios.post("${API}/api/interview/submit", {
+      const res = await axios.post(`${API}/api/interview/submit`, {
         userId: localStorage.getItem("userId"),
         domain,
         difficulty: "easy",

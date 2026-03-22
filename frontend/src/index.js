@@ -16,7 +16,7 @@ import Dashboard from "./pages/Dashboard";
 import UploadResume from "./pages/UploadResume";
 import ResultFeedback from "./resultFeedback/ResultFeedback";
 import CareerGuidance from "./pages/CareerGuidance";
-import PerformanceAnalytics from "./analytics/PerformanceAnalytics";
+import PerformanceAnalytics from "./pages/PerformanceAnalytics";
 import ResumeAnalysis from "./resume/ResumeAnalysis";
 
 /*JOB Matcher*/
@@ -176,7 +176,7 @@ function AppRoutes({ setIsLoggedIn }) {
 }
 
 function MainApp() {
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [, setIsLoggedIn] = useState(false);
 
   useEffect(() => {
     setIsLoggedIn(localStorage.getItem("isLoggedIn") === "true");
