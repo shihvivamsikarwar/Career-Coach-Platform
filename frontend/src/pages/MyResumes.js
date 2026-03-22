@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import axios from "axios";
 import DashboardLayout from "../layout/DashboardLayout";
 import { useNavigate } from "react-router-dom";
@@ -10,11 +10,7 @@ function MyResumes() {
 
   const userId = localStorage.getItem("userId");
 
-  useEffect(() => {
-    fetchResumes();
-  }, []);
-
-  const fetchResumes = async () => {
+  const fetchResumes = useCallback(async () => {
     try {
       const res = await axios.get(`${API}/api/resume/user/${userId}`);
 
@@ -22,7 +18,11 @@ function MyResumes() {
     } catch (error) {
       console.error("Fetch resume error:", error);
     }
-  };
+  }, [userId]);
+
+  useEffect(() => {
+    fetchResumes();
+  }, [fetchResumes]);
 
   const handleDelete = async (id) => {
     if (!window.confirm("Delete this resume?")) return;

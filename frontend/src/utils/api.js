@@ -70,7 +70,7 @@ api.interceptors.response.use(
   },
   (error) => {
     // Centralized error handling
-    const { response, request, config } = error;
+    const { response, request } = error;
     
     if (response) {
       // Server responded with error status

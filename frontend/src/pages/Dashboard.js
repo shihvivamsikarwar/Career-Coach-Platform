@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 
 import DashboardLayout from "../layout/DashboardLayout";
 import StatsCards from "../dashboard/components/StatsCards";
@@ -8,7 +8,7 @@ import AnalyticsChart from "../dashboard/components/AnalyticsChart";
 import WeakAreasChart from "../dashboard/components/WeakAreasChart";
 import SkillRadarChart from "../dashboard/components/SkillRadarChart";
 import RecentInterviews from "../dashboard/components/RecentInterviews";
-import AIInsights from "../dashboard/components/AlInsights";
+import AIInsights from "../dashboard/components/AIInsights";
 import { api, retryRequest } from "../utils/api";
 
 function Dashboard() {
@@ -28,9 +28,9 @@ function Dashboard() {
       setError("User ID not found. Please login again.");
       setIsLoading(false);
     }
-  }, [userId]);
+  }, [userId, fetchDashboardData]);
 
-  const fetchDashboardData = async () => {
+  const fetchDashboardData = useCallback(async () => {
     setIsLoading(true);
     setError(null);
 
@@ -85,7 +85,7 @@ function Dashboard() {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [userId]);
 
   const handleRetry = () => {
     setRetryCount(prev => prev + 1);
