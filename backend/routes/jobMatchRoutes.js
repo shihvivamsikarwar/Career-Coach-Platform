@@ -18,20 +18,7 @@ router.get("/history/:userId", getJobMatchHistory);
 router.get("/analytics/:userId", getJobMatchAnalytics);
 
 // GET SINGLE MATCH REPORT
-router.get("/report/:id", async (req, res) => {
-  try {
-    const match = await JobMatch.findById(req.params.id);
-
-    if (!match) {
-      return res.status(404).json({ message: "Match not found" });
-    }
-
-    res.json(match);
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: "Failed to fetch report" });
-  }
-});
+router.get("/report/:id", getJobMatchById);
 
 router.get("/:id", getJobMatchById);
 

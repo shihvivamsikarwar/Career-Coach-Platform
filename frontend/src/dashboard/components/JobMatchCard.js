@@ -10,7 +10,7 @@ function JobMatchCard() {
     if (!userId) return;
 
     axios
-      .get(`${API}/api/jobmatch/analytics/${userId}`)
+      .get(`${API}/api/job/analytics/${userId}`)
       .then((res) => {
         setData(res.data);
       })

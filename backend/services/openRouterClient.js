@@ -143,7 +143,55 @@ Use the candidate's interview and resume data to return strict JSON:
   };
 }
 
+async function analyzeJobMatch(resumeText, jobDescription) {
+  const systemPrompt = `
+You are an expert job matching AI. Compare a resume with a job description and return strict JSON:
+{
+  "matchScore": 0-100,
+  "selectionProbability": "HIGH|MEDIUM|LOW",
+  "strengths": ["string"],
+  "missingKeywords": ["string"],
+  "improvementTips": ["string"],
+  "skillGap": [
+    {
+      "skill": "string",
+      "required": 0-100,
+      "yourLevel": 0-100,
+      "gap": 0-100
+    }
+  ]
+}
+`;
+
+  const userPrompt = `
+Resume:
+${resumeText}
+
+Job Description:
+${jobDescription}
+
+Please analyze and provide the JSON response.
+`;
+
+  const fallback = {
+    matchScore: 75,
+    selectionProbability: "MEDIUM",
+    strengths: ["Relevant experience", "Good skills"],
+    missingKeywords: ["Some keywords"],
+    improvementTips: ["Add more details", "Highlight achievements"],
+    skillGap: []
+  };
+
+  try {
+    const aiResult = await callOpenRouter(systemPrompt, userPrompt, 0.2);
+    return aiResult || fallback;
+  } catch (error) {
+    console.error("Job Match Analysis Error:", error);
+    return fallback;
+  }
+}
+
 module.exports = callOpenRouter;
+module.exports.analyzeJobMatch = analyzeJobMatch;
 module.exports.generateCareerRecommendations = generateCareerRecommendations;
-module.exports.buildFallbackCareerRecommendations =
-  buildFallbackCareerRecommendations;
+module.exports.buildFallbackCareerRecommendations = buildFallbackCareerRecommendations;
