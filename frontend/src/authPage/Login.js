@@ -1,48 +1,85 @@
 import React, { useState } from "react";
-import axios from "axios";
 import { Link, useNavigate } from "react-router-dom";
 import Footer from "../landingPage/Footer";
+import { api } from "../utils/api";
 
 import { FcGoogle } from "react-icons/fc";
 import { FaGithub, FaLinkedin } from "react-icons/fa";
-import API from "../utils/api";
 
 function Login({ setIsLoggedIn }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [errors, setErrors] = useState({});
 
   const navigate = useNavigate();
 
   const handleLogin = async (e) => {
     e.preventDefault();
-    console.log("handleLogin function called!");
-    console.log("Form data:", { email, password: "***" });
+    setIsLoading(true);
+    setErrors({});
 
     try {
-      console.log("Attempting login to:", `${API}/api/auth/login`);
-      console.log("Login data:", { email, password: "***" });
+      console.log("Attempting login...");
       
-      const res = await axios.post(`${API}/api/auth/login`, {
+      const response = await api.post('/api/auth/login', {
         email,
         password,
       });
 
-      console.log("Login response:", res.data);
+      console.log("Login response:", response.data);
 
-      localStorage.setItem("userId", res.data.user._id);
-      localStorage.setItem("userName", res.data.user.name);
+      // Store authentication data
+      localStorage.setItem("token", response.data.token);
+      localStorage.setItem("userId", response.data.user._id);
+      localStorage.setItem("userName", response.data.user.name);
       localStorage.setItem("isLoggedIn", "true");
 
       setIsLoggedIn(true);
       navigate("/dashboard");
     } catch (err) {
       console.error("Login error:", err);
-      console.error("Error response:", err.response?.data);
-      console.error("Error status:", err.response?.status);
       
-      const errorMessage = err.response?.data?.message || "Login failed";
-      alert(errorMessage);
+      // Handle different error types
+      if (err.response) {
+        // Server responded with error status
+        const { data, status } = err.response;
+        
+        if (status === 429) {
+          setErrors({ general: "Too many login attempts. Please try again later." });
+        } else if (status === 400) {
+          setErrors(data.field ? { [data.field]: data.error } : { general: data.error });
+        } else if (status === 500) {
+          setErrors({ general: "Server error. Please try again later." });
+        } else {
+          setErrors({ general: data.error || "Login failed" });
+        }
+      } else if (err.request) {
+        // Network error
+        setErrors({ general: "Network error. Please check your connection." });
+      } else {
+        // Other error
+        setErrors({ general: "Login failed. Please try again." });
+      }
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleInputChange = (field, value) => {
+    // Clear errors when user starts typing
+    if (errors[field]) {
+      setErrors(prev => ({ ...prev, [field]: null }));
+    }
+    if (errors.general) {
+      setErrors(prev => ({ ...prev, general: null }));
+    }
+    
+    if (field === 'email') {
+      setEmail(value);
+    } else if (field === 'password') {
+      setPassword(value);
     }
   };
 
@@ -101,11 +138,18 @@ function Login({ setIsLoggedIn }) {
                 <label className="form-label fw-semibold">Email</label>
                 <input
                   type="email"
-                  className="form-control py-2"
+                  className={`form-control py-2 ${errors.email ? 'is-invalid' : ''}`}
                   placeholder="Enter your email"
-                  onChange={(e) => setEmail(e.target.value)}
-                  required
+                  value={email}
+                  onChange={(e) => handleInputChange('email', e.target.value)}
+                  disabled={isLoading}
+                  required={true}
                 />
+                {errors.email && (
+                  <div className="invalid-feedback d-block">
+                    {errors.email}
+                  </div>
+                )}
               </div>
 
               <div className="mb-4 position-relative">
@@ -113,12 +157,13 @@ function Login({ setIsLoggedIn }) {
 
                 <input
                   type={showPassword ? "text" : "password"}
-                  className="form-control py-2"
+                  className={`form-control py-2 ${errors.password ? 'is-invalid' : ''}`}
                   placeholder="Enter your password"
-                  onChange={(e) => setPassword(e.target.value)}
-                  required
+                  value={password}
+                  onChange={(e) => handleInputChange('password', e.target.value)}
+                  disabled={isLoading}
+                  required={true}
                 />
-
                 <span
                   onClick={() => setShowPassword(!showPassword)}
                   style={{
@@ -133,20 +178,42 @@ function Login({ setIsLoggedIn }) {
                 >
                   {showPassword ? "Hide" : "Show"}
                 </span>
+                
+                {errors.password && (
+                  <div className="invalid-feedback d-block">
+                    {errors.password}
+                  </div>
+                )}
               </div>
+
+              {errors.general && (
+                <div className="alert alert-danger mb-3" role="alert">
+                  {errors.general}
+                </div>
+              )}
 
               <button
                 type="submit"
                 className="btn w-100 py-2"
                 style={{
                   borderRadius: "30px",
-                  background: "linear-gradient(135deg,#6366F1,#8B5CF6)",
+                  background: isLoading 
+                    ? "linear-gradient(135deg,#9CA3AF,#9CA3AF)" 
+                    : "linear-gradient(135deg,#6366F1,#8B5CF6)",
                   color: "white",
                   fontWeight: "600",
                   boxShadow: "0px 10px 25px rgba(99,102,241,0.3)",
                 }}
+                disabled={isLoading}
               >
-                Login
+                {isLoading ? (
+                  <>
+                    <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                    Logging in...
+                  </>
+                ) : (
+                  "Login"
+                )}
               </button>
             </form>
 

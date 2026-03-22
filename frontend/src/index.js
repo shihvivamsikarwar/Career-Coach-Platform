@@ -4,6 +4,8 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 
 import "bootstrap/dist/css/bootstrap.min.css";
 
+import ErrorBoundary from "./components/ErrorBoundary";
+
 /* Public */
 import LandingPage from "./landingPage/LandingPage";
 import Login from "./authPage/Login";
@@ -181,9 +183,11 @@ function MainApp() {
   }, []);
 
   return (
-    <Router>
-      <AppRoutes setIsLoggedIn={setIsLoggedIn} />
-    </Router>
+    <ErrorBoundary>
+      <Router>
+        <AppRoutes setIsLoggedIn={setIsLoggedIn} />
+      </Router>
+    </ErrorBoundary>
   );
 }
 
