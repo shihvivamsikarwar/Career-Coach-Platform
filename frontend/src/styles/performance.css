@@ -1,0 +1,525 @@
+/* =====================================================
+   PERFORMANCE OPTIMIZATIONS
+===================================================== */
+
+/* Page Transition Container */
+.page-transition-container {
+  position: relative;
+  min-height: 100vh;
+  overflow: hidden;
+}
+
+.page-transition-content {
+  position: relative;
+  z-index: 1;
+}
+
+/* Fast Page Transitions */
+.page-enter {
+  opacity: 0;
+  transform: translateY(30px) scale(0.95);
+}
+
+.page-enter-active {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+  transition: opacity 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94), 
+              transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.page-exit {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+}
+
+.page-exit-active {
+  opacity: 0;
+  transform: translateY(-30px) scale(0.95);
+  transition: opacity 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94), 
+              transform 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+/* Fast Transitions */
+.fast-transition {
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2);
+}
+
+.fast-transition-smooth {
+  transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+/* GPU Acceleration */
+.gpu-accelerated {
+  transform: translateZ(0);
+  will-change: transform, opacity;
+  backface-visibility: hidden;
+  perspective: 1000px;
+}
+
+/* Smooth Page Transitions */
+.page-transition-enter {
+  opacity: 0;
+  transform: translateY(20px);
+}
+
+.page-transition-enter-active {
+  opacity: 1;
+  transform: translateY(0);
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.page-transition-exit {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.page-transition-exit-active {
+  opacity: 0;
+  transform: translateY(-20px);
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+/* Fast Loading States */
+.loading-skeleton {
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background-size: 200% 100%;
+  animation: loading 1.5s infinite;
+}
+
+@keyframes loading {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+/* Optimized Images */
+.img-optimized {
+  content-visibility: auto;
+  contain-intrinsic-size: auto;
+}
+
+/* Fast Hover Effects */
+.hover-fast {
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.hover-fast:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+}
+
+/* Smooth Scrolling */
+.smooth-scroll {
+  scroll-behavior: smooth;
+  scroll-padding-top: 80px;
+}
+
+/* Reduced Motion for Performance */
+@media (prefers-reduced-motion: no-preference) {
+  .fast-transition,
+  .fast-transition-smooth {
+    transition: none;
+  }
+}
+
+/* Fast Animations */
+.animate-fast {
+  animation-duration: 0.3s;
+}
+
+.animate-faster {
+  animation-duration: 0.2s;
+}
+
+/* Performance Optimizations */
+.optimize-performance {
+  contain: layout style paint;
+}
+
+/* Fast Button Interactions */
+.btn-fast {
+  transition: all 0.15s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.btn-fast::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.3);
+  transform: translate(-50%, -50%);
+  transition: width 0.3s ease, height 0.3s ease;
+}
+
+.btn-fast:hover::after {
+  width: 100%;
+  height: 100%;
+}
+
+/* Fast Card Effects */
+.card-fast {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  will-change: transform, box-shadow;
+}
+
+.card-fast:hover {
+  transform: translateY(-4px) scale(1.02);
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.1);
+}
+
+/* Fast Form Inputs */
+.input-fast {
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.input-fast:focus {
+  border-color: #667eea;
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+  outline: none;
+}
+
+/* Fast Navigation */
+.nav-fast {
+  transition: all 0.2s ease;
+}
+
+.nav-fast:hover {
+  transform: translateY(-1px);
+}
+
+/* Fast Loading Spinners */
+.spinner-fast {
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Fast Fade Effects */
+.fade-in-fast {
+  animation: fadeIn 0.2s ease-in;
+}
+
+.fade-out-fast {
+  animation: fadeOut 0.2s ease-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes fadeOut {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+/* Fast Slide Effects */
+.slide-in-right-fast {
+  animation: slideInRight 0.3s ease-out;
+}
+
+.slide-in-left-fast {
+  animation: slideInLeft 0.3s ease-out;
+}
+
+@keyframes slideInRight {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes slideInLeft {
+  from {
+    transform: translateX(-100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+/* Fast Scale Effects */
+.scale-in-fast {
+  animation: scaleIn 0.2s ease-out;
+}
+
+@keyframes scaleIn {
+  from {
+    transform: scale(0.8);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+/* Performance Monitoring */
+.performance-mode {
+  --transition-speed: 0.2s;
+  --animation-speed: 0.3s;
+}
+
+/* Fast Dropdown Menus */
+.dropdown-fast {
+  transition: all 0.15s ease;
+  transform-origin: top;
+}
+
+.dropdown-fast:hover {
+  transform: scaleY(1);
+}
+
+/* Fast Modal Effects */
+.modal-fast {
+  transition: all 0.2s ease;
+}
+
+.modal-fast.show {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.modal-fast.hide {
+  opacity: 0;
+  transform: scale(0.9);
+}
+
+/* Fast Tab Switching */
+.tab-fast {
+  transition: all 0.15s ease;
+}
+
+.tab-fast.active {
+  border-bottom: 2px solid #667eea;
+  color: #667eea;
+}
+
+/* Fast Progress Bars */
+.progress-fast {
+  transition: width 0.3s ease;
+}
+
+/* Fast Tooltips */
+.tooltip-fast {
+  transition: opacity 0.15s ease, transform 0.15s ease;
+}
+
+.tooltip-fast.show {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.tooltip-fast.hide {
+  opacity: 0;
+  transform: translateY(5px);
+}
+
+/* Educational Platform Optimizations */
+.edu-platform-fast {
+  --primary-color: #667eea;
+  --secondary-color: #764ba2;
+  --success-color: #10b981;
+  --warning-color: #f59e0b;
+  --danger-color: #ef4444;
+  --transition-speed: 0.2s;
+  --border-radius: 8px;
+}
+
+/* Fast Student Dashboard */
+.student-dashboard {
+  transition: all var(--transition-speed) ease;
+}
+
+.student-dashboard:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 25px rgba(102, 126, 234, 0.1);
+}
+
+/* Fast Job Seeker Interface */
+.job-seeker-fast {
+  transition: all var(--transition-speed) ease;
+}
+
+.job-seeker-fast:hover {
+  transform: scale(1.02);
+  box-shadow: 0 8px 20px rgba(102, 126, 234, 0.15);
+}
+
+/* Fast Course Cards */
+.course-card-fast {
+  transition: all var(--transition-speed) ease;
+  border-radius: var(--border-radius);
+}
+
+.course-card-fast:hover {
+  transform: translateY(-4px) scale(1.02);
+  box-shadow: 0 12px 30px rgba(102, 126, 234, 0.2);
+}
+
+/* Fast Interview Interface */
+.interview-fast {
+  transition: all var(--transition-speed) ease;
+}
+
+.interview-fast:hover {
+  transform: scale(1.01);
+  box-shadow: 0 6px 15px rgba(102, 126, 234, 0.1);
+}
+
+/* Fast Resume Upload */
+.resume-upload-fast {
+  transition: all var(--transition-speed) ease;
+  border: 2px dashed #cbd5e1;
+}
+
+.resume-upload-fast:hover {
+  border-color: var(--primary-color);
+  background: rgba(102, 126, 234, 0.05);
+  transform: scale(1.02);
+}
+
+/* Fast Analytics Charts */
+.chart-fast {
+  transition: all var(--transition-speed) ease;
+}
+
+.chart-fast:hover {
+  transform: scale(1.05);
+  filter: brightness(1.1);
+}
+
+/* Fast Search Results */
+.search-result-fast {
+  transition: all var(--transition-speed) ease;
+}
+
+.search-result-fast:hover {
+  transform: translateX(5px);
+  background: rgba(102, 126, 234, 0.05);
+  border-left: 3px solid var(--primary-color);
+}
+
+/* Fast Profile Cards */
+.profile-card-fast {
+  transition: all var(--transition-speed) ease;
+}
+
+.profile-card-fast:hover {
+  transform: translateY(-3px) scale(1.01);
+  box-shadow: 0 10px 25px rgba(102, 126, 234, 0.15);
+}
+
+/* Fast Navigation Items */
+.nav-item-fast {
+  transition: all var(--transition-speed) ease;
+  position: relative;
+}
+
+.nav-item-fast::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  width: 0;
+  height: 2px;
+  background: var(--primary-color);
+  transition: width var(--transition-speed) ease;
+}
+
+.nav-item-fast:hover::after {
+  width: 100%;
+}
+
+/* Fast Form Validation */
+.form-validation-fast {
+  transition: all var(--transition-speed) ease;
+}
+
+.form-validation-fast.error {
+  border-color: var(--danger-color);
+  background: rgba(239, 68, 68, 0.05);
+  animation: shake 0.3s ease-in-out;
+}
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-5px); }
+  75% { transform: translateX(5px); }
+}
+
+/* Fast Success Messages */
+.success-message-fast {
+  animation: slideDown 0.3s ease-out;
+}
+
+@keyframes slideDown {
+  from {
+    transform: translateY(-100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+/* Fast Error Messages */
+.error-message-fast {
+  animation: shake 0.3s ease-in-out, fadeIn 0.3s ease-in;
+}
+
+/* Fast Loading States for Education */
+.edu-loading-fast {
+  position: relative;
+  overflow: hidden;
+}
+
+.edu-loading-fast::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(102, 126, 234, 0.2), transparent);
+  animation: loadingSlide 1.5s infinite;
+}
+
+@keyframes loadingSlide {
+  from {
+    left: -100%;
+  }
+  to {
+    left: 100%;
+  }
+}

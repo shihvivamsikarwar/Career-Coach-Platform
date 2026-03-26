@@ -3,39 +3,43 @@ import ReactDOM from "react-dom/client";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 
 import "bootstrap/dist/css/bootstrap.min.css";
+import "./styles/landingPage.css";
+import "./styles/responsive.css";
+import "./styles/performance.css";
+import "./styles/hero-stunning.css";
 
-import ErrorBoundary from "./components/ErrorBoundary";
+import ErrorBoundary from "./components/common/ErrorBoundary";
 
 /* Public */
-import LandingPage from "./landingPage/LandingPage";
-import Login from "./authPage/Login";
-import Register from "./authPage/Register";
+import LandingPage from "./features/landing/LandingPage";
+import Login from "./features/auth/components/Login";
+import Register from "./features/auth/components/Register";
 
 /* Protected Pages */
-import Dashboard from "./pages/Dashboard";
-import UploadResume from "./pages/UploadResume";
-import ResultFeedback from "./resultFeedback/ResultFeedback";
-import CareerGuidance from "./pages/CareerGuidance";
-import PerformanceAnalytics from "./pages/PerformanceAnalytics";
-import ResumeAnalysis from "./resume/ResumeAnalysis";
+import Dashboard from "./features/dashboard/Dashboard";
+import UploadResume from "./features/resume/UploadResume";
+import ResultFeedback from "./features/interview/ResultFeedback";
+import CareerGuidance from "./features/dashboard/CareerGuidance";
+import PerformanceAnalytics from "./features/dashboard/PerformanceAnalytics";
+import ResumeAnalysis from "./features/resume/ResumeAnalysis";
 
 /*JOB Matcher*/
-import JobMatch from "./pages/JobMatch";
-import JobMatchHistory from "./pages/JobMatchHistory";
-import JobMatchAnalytics from "./pages/JobMatchAnalytics";
-import JobMatchReport from "./pages/JobMatchReport";
-import JobMatchResult from "./pages/JobMatchResult";
+import JobMatch from "./features/job-match/JobMatch";
+import JobMatchHistory from "./features/job-match/JobMatchHistory";
+import JobMatchAnalytics from "./features/job-match/JobMatchAnalytics";
+import JobMatchReport from "./features/job-match/JobMatchReport";
+import JobMatchResult from "./features/job-match/JobMatchResult";
 
 /* Components */
-import ProtectedRoute from "./components/ProtectedRoute";
-import MyResumes from "./pages/MyResumes";
+import ProtectedRoute from "./components/common/ProtectedRoute";
+import MyResumes from "./features/resume/MyResumes";
 
 /*Interviews Pages*/
-import InterviewHome from "./pages/InterviewHome";
-import MockInterview from "./pages/MockInterview";
-import InterviewHistory from "./pages/InterviewHistory";
-import InterviewResult from "./pages/InterviewResult";
-import InterviewReport from "./pages/InterviewReport";
+import InterviewHome from "./features/interview/InterviewHome";
+import MockInterview from "./features/interview/MockInterview";
+import InterviewHistory from "./features/interview/InterviewHistory";
+import InterviewResult from "./features/interview/InterviewResult";
+import InterviewReport from "./features/interview/InterviewReport";
 
 function AppRoutes({ setIsLoggedIn }) {
   return (
